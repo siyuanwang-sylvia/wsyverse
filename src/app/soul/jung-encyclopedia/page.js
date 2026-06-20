@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useInView } from "react-intersection-observer";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 // 深色/浅色模式配置
 const THEMES = {
@@ -175,6 +177,15 @@ export default function JungEncyclopedia() {
   const [flippedCard, setFlippedCard] = useState(null);
   const contentRef = useRef(null);
 
+  // Markdown 内容状态
+  const [introContent, setIntroContent] = useState("");
+  const [biographyContent, setBiographyContent] = useState("");
+  const [theoryContent, setTheoryContent] = useState("");
+  const [relationshipsContent, setRelationshipsContent] = useState("");
+  const [applicationsContent, setApplicationsContent] = useState("");
+  const [resourcesContent, setResourcesContent] = useState("");
+  const [functionsContent, setFunctionsContent] = useState({});
+
   const currentTheme = THEMES[theme];
 
   // 滚动监听，更新当前章节
@@ -195,6 +206,52 @@ export default function JungEncyclopedia() {
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // 加载 Markdown 文件
+  useEffect(() => {
+    const loadMarkdown = async (filePath) => {
+      try {
+        const response = await fetch(filePath);
+        if (!response.ok) throw new Error(`Failed to load ${filePath}`);
+        const text = await response.text();
+        return text;
+      } catch (error) {
+        console.error("Error loading markdown:", error);
+        return "";
+      }
+    };
+
+    const loadAllContent = async () => {
+      // 加载各章节内容
+      const intro = await loadMarkdown("/jung-encyclopedia/content/introduction.md");
+      setIntroContent(intro);
+
+      const biography = await loadMarkdown("/jung-encyclopedia/content/biography.md");
+      setBiographyContent(biography);
+
+      const theory = await loadMarkdown("/jung-encyclopedia/content/theory.md");
+      setTheoryContent(theory);
+
+      const relationships = await loadMarkdown("/jung-encyclopedia/content/relationships.md");
+      setRelationshipsContent(relationships);
+
+      const applications = await loadMarkdown("/jung-encyclopedia/content/applications.md");
+      setApplicationsContent(applications);
+
+      const resources = await loadMarkdown("/jung-encyclopedia/content/resources.md");
+      setResourcesContent(resources);
+
+      // 加载八种心理功能的内容
+      const functions = {};
+      for (const func of COGNITIVE_FUNCTIONS) {
+        const content = await loadMarkdown(`/jung-encyclopedia/content/functions/${func.id}.md`);
+        functions[func.id] = content;
+      }
+      setFunctionsContent(functions);
+    };
+
+    loadAllContent();
   }, []);
 
   // 平滑滚动到指定章节
@@ -381,17 +438,8 @@ export default function JungEncyclopedia() {
           {/* 引言 */}
           <section id="introduction" className="scroll-mt-24">
             <FadeInSection>
-              <h2 className={`text-3xl font-light ${currentTheme.text} mb-8`}>引言</h2>
               <div className={`${currentTheme.bgCard} backdrop-blur-lg rounded-2xl p-8 ${currentTheme.cardShadow} border ${currentTheme.border}`}>
-                <p className={`${currentTheme.textSecondary} leading-relaxed mb-6`}>
-                  卡尔·古斯塔夫·荣格（Carl Gustav Jung, 1875-1961）是瑞士心理学家，分析心理学创始人。他提出的心理类型理论，特别是八种认知功能模型，为我们理解人类心理差异提供了深刻的框架。
-                </p>
-                <p className={`${currentTheme.textSecondary} leading-relaxed mb-6`}>
-                  与迈尔斯-布里格斯类型指标（MBTI）不同，荣格的原初理论更加精细和深邃。八种认知功能不仅仅是类型的标签，而是心理能量的流动方式，是个体与世界互动的基本模式。
-                </p>
-                <p className={`${currentTheme.textSecondary} leading-relaxed`}>
-                  本百科将带你深入理解这八种心理功能，探索它们如何在日常生活中显现，以及如何通过自我觉察实现心理整合与成长。
-                </p>
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{introContent}</ReactMarkdown>
               </div>
             </FadeInSection>
           </section>
