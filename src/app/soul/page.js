@@ -76,7 +76,7 @@ export default function Soul() {
   return (
     <main className="relative h-screen overflow-hidden bg-[#050816] text-[#e8d7b5]">
 
-      {/* 返回键 */}
+      {/* 返回键 - 更高对比度 */}
       <motion.div
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
@@ -86,7 +86,7 @@ export default function Soul() {
         <Link href="/">
           <motion.div
             whileHover={{ x: -4 }}
-            className="px-5 py-3 border border-[#8d7753]/40 rounded-xl bg-[#0b1020]/90 backdrop-blur-lg text-sm uppercase tracking-[0.2em] text-[#d6b77a] hover:bg-[#8d7753]/20 hover:text-[#ffe7b0] transition-all duration-500"
+            className="px-5 py-3 border border-amber-700/60 rounded-xl bg-[#0b1020]/95 backdrop-blur-lg text-sm uppercase tracking-[0.2em] text-amber-200 hover:bg-amber-900/30 hover:text-amber-100 transition-all duration-500 shadow-lg shadow-amber-900/20"
           >
             ← Universe
           </motion.div>
