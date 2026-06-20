@@ -41,4 +41,34 @@ yarn-error.log*
 next-env.d.ts
 
 .vercel
-# SYLVIA PERSONAL UNIVERSE - Sat Jun 20 13:40:51     2026
+
+# ∼∼∼ 大文件策略 (SYLVIA PERSONAL UNIVERSE) ∼∼∼
+# Git LFS 管理中等大文件（< 2GB）
+# LFS 免费额度：1GB 存储 / 1GB 带宽/月
+# 超出额度的文件请存入外部图床/云盘，在网站里用链接引用
+
+# LFS 追踪规则（已由 git lfs track 写入 .gitattributes）
+# *.pdf, *.mp4, *.mov, *.zip, *.rar, *.psd, *.ai
+
+# 超大文件直接忽略（Git LFS 也传不上去的）
+*.iso
+*.dmg
+*.bin
+*.exe
+*.msi
+*.img
+*.gho
+*.vmdk
+*.vhd
+*.vhdx
+
+# 临时文件
+*.tmp
+*.temp
+~$*
+Thumbs.db
+Desktop.ini
+
+# 系统文件
+$RECYCLE.BIN/
+System Volume Information/
