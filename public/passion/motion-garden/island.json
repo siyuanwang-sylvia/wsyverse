@@ -1,0 +1,24 @@
+{
+  "name": "Motion Garden",
+  "subtitle": "Where Stillness Learns to Dance",
+  "desc": "A garden that never stops becoming. Paint strokes bloom into flowers, photographs crystallize into glass sculptures, dance movements ripple through the air like visible wind. Every creative act plants a seed — and the garden remembers them all, growing wilder and more beautiful with each season of the soul.",
+  "color": "#1a1a2a",
+  "glow": "#8a5aaa",
+  "light": "#aa7aca",
+  "icon": "🎨",
+  "realm": "art",
+  "theme": {
+    "bg": "#020a18",
+    "accent": "#7a4a9a",
+    "particleColor": "rgba(160,120,200,0.5)",
+    "nebulaColor": "rgba(80,40,120,0.04)",
+    "atmosphere": "dream-garden"
+  },
+  "sections": [
+    { "id": "painting", "name": "Painting", "nameCN": "绘画", "icon": "🎨" },
+    { "id": "photography", "name": "Photography", "nameCN": "摄影", "icon": "📸" },
+    { "id": "dance", "name": "Dance", "nameCN": "舞蹈", "icon": "💃" },
+    { "id": "inspiration-wall", "name": "Inspiration Wall", "nameCN": "灵感墙", "icon": "📌" },
+    { "id": "sketches", "name": "Sketches", "nameCN": "速写本", "icon": "✏" }
+  ]
+}

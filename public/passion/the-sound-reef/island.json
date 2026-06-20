@@ -1,0 +1,32 @@
+{
+  "name": "The Sound Reef",
+  "subtitle": "Where Frequencies Become Landscapes",
+  "desc": "A living reef sculpted by sound itself. Each instrument is a coral formation, each melody a current. The weather here changes with the music you play — a rainy day for sad songs, sunlight breaking through for triumphant chords. This is where listening becomes topography.",
+  "color": "#1a2a3a",
+  "glow": "#5a9aaa",
+  "light": "#7abaca",
+  "icon": "🎵",
+  "realm": "sound",
+  "theme": {
+    "bg": "#020d18",
+    "accent": "#4a8a9a",
+    "particleColor": "rgba(80,180,200,0.5)",
+    "nebulaColor": "rgba(20,100,140,0.04)",
+    "atmosphere": "ocean-cave"
+  },
+  "sections": [
+    { "id": "instruments", "name": "Instruments", "nameCN": "乐器", "icon": "🎹" },
+    { "id": "scores", "name": "Sheet Music", "nameCN": "乐谱", "icon": "🎼" },
+    { "id": "videos", "name": "Performances", "nameCN": "演奏视频", "icon": "🎥" },
+    { "id": "theory", "name": "Theory & Knowledge", "nameCN": "乐理知识", "icon": "📖" },
+    { "id": "performances", "name": "Live Records", "nameCN": "演奏记录", "icon": "🎤" },
+    { "id": "albums", "name": "Collected Albums", "nameCN": "收藏专辑", "icon": "💿" },
+    { "id": "playlists", "name": "Mood Playlists", "nameCN": "情绪歌单", "icon": "🎧" }
+  ],
+  "instruments": [
+    { "id": "guitar", "name": "Guitar", "nameCN": "吉他", "icon": "🎸" },
+    { "id": "piano", "name": "Piano", "nameCN": "钢琴", "icon": "🎹" },
+    { "id": "drums", "name": "Drums", "nameCN": "架子鼓", "icon": "🥁" },
+    { "id": "composition", "name": "Composition", "nameCN": "编曲", "icon": "🎛" }
+  ]
+}

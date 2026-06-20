@@ -1,0 +1,25 @@
+{
+  "name": "Playground",
+  "subtitle": "The Body's Expedition Log",
+  "desc": "Not a playground for children — a proving ground for the spirit made flesh. Each sport is a different terrain on this ever-shifting island: deep-sea ruins for diving, alpine peaks for skiing, vertical cliffs for climbing, underground arenas for boxing, and neon streets for skateboarding. The body learns. The island remembers.",
+  "color": "#1a2a1a",
+  "glow": "#5a8a4a",
+  "light": "#7aaa6a",
+  "icon": "🏄",
+  "realm": "motion",
+  "theme": {
+    "bg": "#020a08",
+    "accent": "#4a8a5a",
+    "particleColor": "rgba(80,180,120,0.5)",
+    "nebulaColor": "rgba(20,100,60,0.04)",
+    "atmosphere": "dynamic-terrain"
+  },
+  "sections": [
+    { "id": "diving", "name": "Deep Memory Archive", "nameCN": "深海记忆档案馆", "icon": "🌊", "scene": "Deep sea ruins", "desc": "Diving certs, ocean photos, dive logs, fish records, depth records, underwater videos" },
+    { "id": "skiing", "name": "Frost Ridge", "nameCN": "雪山", "icon": "🏔", "scene": "Snow mountain", "desc": "Ski logs, mountain photos, gear config" },
+    { "id": "climbing", "name": "The Ascent", "nameCN": "攀岩", "icon": "🧗", "scene": "Cliff face", "desc": "Route records, grade progression, climbing photos" },
+    { "id": "boxing", "name": "Underground Arena", "nameCN": "地下竞技场", "icon": "🥊", "scene": "Underground arena", "desc": "Training logs, sparring footage, technique notes" },
+    { "id": "skateboarding", "name": "Neon Drift", "nameCN": "滑板", "icon": "🛹", "scene": "Neon city", "desc": "Trick progression, spot maps, session footage" },
+    { "id": "certificates", "name": "Hall of Proof", "nameCN": "证书馆", "icon": "📜", "desc": "All achievement certificates across all sports" }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "name": "Celestarium",
+  "subtitle": "The Quiet Orbit",
+  "desc": "A personal observatory drifting through cosmic silence. Here, stars are not studied — they are witnessed. Every planet, every meteor, every deep-space photograph is a fragment of the eternal conversation between light and darkness.",
+  "color": "#0a1a3a",
+  "glow": "#4a7aaa",
+  "light": "#6a9aca",
+  "icon": "🔭",
+  "realm": "celestial",
+  "theme": {
+    "bg": "#020818",
+    "accent": "#4a8aaa",
+    "particleColor": "rgba(120,180,220,0.5)",
+    "nebulaColor": "rgba(40,80,160,0.04)",
+    "atmosphere": "deep-cosmos"
+  },
+  "sections": [
+    { "id": "star-charts", "name": "Star Charts", "nameCN": "星图", "icon": "⭐" },
+    { "id": "photos", "name": "Observations", "nameCN": "天文照片", "icon": "📷" },
+    { "id": "planets", "name": "Planetary Atlas", "nameCN": "行星知识", "icon": "🪐" },
+    { "id": "nasa", "name": "NASA Archives", "nameCN": "NASA资料", "icon": "🛰" },
+    { "id": "logs", "name": "Stargazing Log", "nameCN": "观星日志", "icon": "📔" },
+    { "id": "meteors", "name": "Meteor Records", "nameCN": "流星记录", "icon": "☄" },
+    { "id": "documentaries", "name": "Cosmic Cinema", "nameCN": "太空纪录片", "icon": "🎬" },
+    { "id": "telescope", "name": "Telescope Config", "nameCN": "望远镜配置", "icon": "🔭" },
+    { "id": "theory", "name": "Cosmic Theory", "nameCN": "宇宙理论", "icon": "∞" }
+  ]
+}
