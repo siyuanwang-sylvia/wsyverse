@@ -613,6 +613,84 @@ export default function JungEncyclopedia() {
               </div>
             </FadeInSection>
 
+            {/* 功能关系可视化 */}
+            <FadeInSection>
+              <div className={`${currentTheme.bgCard} backdrop-blur-lg rounded-2xl p-8 ${currentTheme.cardShadow} border ${currentTheme.border} mb-8`}>
+                <h3 className={`text-xl ${currentTheme.text} mb-6`}>八种功能关系图</h3>
+                <p className={`${currentTheme.textSecondary} text-sm leading-relaxed mb-6`}>
+                  下面的关系图展示了八种认知功能之间的对应关系。对立功能（如 Si-Ne）形成互补的平衡关系。
+                </p>
+                
+                <div className="flex justify-center">
+                  <svg width="600" height="600" viewBox="0 0 600 600" className="max-w-full h-auto">
+                    {/* 背景圆 */}
+                    <circle cx="300" cy="300" r="250" fill="none" stroke={`${currentTheme.border.includes('border-[') ? '#e8e4df' : '#3a3a3a'}`} strokeWidth="1" opacity="0.3" />
+                    <circle cx="300" cy="300" r="180" fill="none" stroke={`${currentTheme.border.includes('border-[') ? '#e8e4df' : '#3a3a3a'}`} strokeWidth="1" opacity="0.2" />
+                    
+                    {/* 连接线 - 对立功能对 */}
+                    <line x1="300" y1="100" x2="300" y2="500" stroke="#7a9e7e" strokeWidth="2" opacity="0.6" />
+                    <line x1="100" y1="300" x2="500" y2="300" stroke="#6a8eaa" strokeWidth="2" opacity="0.6" />
+                    <line x1="158" y1="158" x2="442" y2="442" stroke="#8e6a6a" strokeWidth="2" opacity="0.6" />
+                    <line x1="442" y1="158" x2="158" y2="442" stroke="#8e6a8e" strokeWidth="2" opacity="0.6" />
+                    
+                    {/* 功能节点 */}
+                    {/* Si */}
+                    <circle cx="300" cy="100" r="30" fill={currentTheme.bgCard} stroke="#7a9e7e" strokeWidth="3" />
+                    <text x="300" y="105" textAnchor="middle" fill={currentTheme.text} fontSize="16" fontWeight="light">Si</text>
+                    <text x="300" y="70" textAnchor="middle" fill="#7a9e7e" fontSize="12">内倾感觉</text>
+                    
+                    {/* Ne */}
+                    <circle cx="300" cy="500" r="30" fill={currentTheme.bgCard} stroke="#7a9e7e" strokeWidth="3" />
+                    <text x="300" y="505" textAnchor="middle" fill={currentTheme.text} fontSize="16" fontWeight="light">Ne</text>
+                    <text x="300" y="540" textAnchor="middle" fill="#7a9e7e" fontSize="12">外倾直觉</text>
+                    
+                    {/* Ni */}
+                    <circle cx="100" cy="300" r="30" fill={currentTheme.bgCard} stroke="#6a8eaa" strokeWidth="3" />
+                    <text x="100" y="305" textAnchor="middle" fill={currentTheme.text} fontSize="16" fontWeight="light">Ni</text>
+                    <text x="60" y="270" textAnchor="middle" fill="#6a8eaa" fontSize="12">内倾直觉</text>
+                    
+                    {/* Se */}
+                    <circle cx="500" cy="300" r="30" fill={currentTheme.bgCard} stroke="#6a8eaa" strokeWidth="3" />
+                    <text x="500" y="305" textAnchor="middle" fill={currentTheme.text} fontSize="16" fontWeight="light">Se</text>
+                    <text x="540" y="270" textAnchor="middle" fill="#6a8eaa" fontSize="12">外倾感觉</text>
+                    
+                    {/* Ti */}
+                    <circle cx="158" cy="158" r="30" fill={currentTheme.bgCard} stroke="#8e6a6a" strokeWidth="3" />
+                    <text x="158" y="163" textAnchor="middle" fill={currentTheme.text} fontSize="16" fontWeight="light">Ti</text>
+                    <text x="120" y="125" textAnchor="middle" fill="#8e6a6a" fontSize="12">内倾思考</text>
+                    
+                    {/* Fe */}
+                    <circle cx="442" cy="442" r="30" fill={currentTheme.bgCard} stroke="#8e6a6a" strokeWidth="3" />
+                    <text x="442" y="447" textAnchor="middle" fill={currentTheme.text} fontSize="16" fontWeight="light">Fe</text>
+                    <text x="480" y="480" textAnchor="middle" fill="#8e6a6a" fontSize="12">外倾情感</text>
+                    
+                    {/* Fi */}
+                    <circle cx="442" cy="158" r="30" fill={currentTheme.bgCard} stroke="#8e6a8e" strokeWidth="3" />
+                    <text x="442" y="163" textAnchor="middle" fill={currentTheme.text} fontSize="16" fontWeight="light">Fi</text>
+                    <text x="480" y="125" textAnchor="middle" fill="#8e6a8e" fontSize="12">内倾情感</text>
+                    
+                    {/* Te */}
+                    <circle cx="158" cy="442" r="30" fill={currentTheme.bgCard} stroke="#8e6a8e" strokeWidth="3" />
+                    <text x="158" y="447" textAnchor="middle" fill={currentTheme.text} fontSize="16" fontWeight="light">Te</text>
+                    <text x="120" y="480" textAnchor="middle" fill="#8e6a8e" fontSize="12">外倾思考</text>
+                    
+                    {/* 图例 */}
+                    <rect x="50" y="560" width="20" height="3" fill="#7a9e7e" />
+                    <text x="80" y="565" fill={currentTheme.textSecondary} fontSize="11">Si-Ne 对</text>
+                    
+                    <rect x="200" y="560" width="20" height="3" fill="#6a8eaa" />
+                    <text x="230" y="565" fill={currentTheme.textSecondary} fontSize="11">Ni-Se 对</text>
+                    
+                    <rect x="350" y="560" width="20" height="3" fill="#8e6a6a" />
+                    <text x="380" y="565" fill={currentTheme.textSecondary} fontSize="11">Ti-Fe 对</text>
+                    
+                    <rect x="480" y="560" width="20" height="3" fill="#8e6a8e" />
+                    <text x="510" y="565" fill={currentTheme.textSecondary} fontSize="11">Fi-Te 对</text>
+                  </svg>
+                </div>
+              </div>
+            </FadeInSection>
+
             {/* 类型表 */}
             <FadeInSection>
               <div className={`${currentTheme.bgCard} backdrop-blur-lg rounded-2xl p-8 ${currentTheme.cardShadow} border ${currentTheme.border}`}>
