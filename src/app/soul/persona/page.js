@@ -31,7 +31,7 @@ const PARTICLES = [
   { x: 38, y:  5, s: 1.2, o: 0.10, d: 17 },
 ];
 
-const CORRECT_PASSWORD = "Be yourself";
+const CORRECT_PASSWORD = "BE YOURSELF";
 
 /* ═════════════════════════════════════════
    Persona Chamber — 密码保护版
@@ -55,7 +55,7 @@ export default function Persona() {
     e?.preventDefault();
     setEntering(true);
     setTimeout(() => {
-      if (password.trim() === CORRECT_PASSWORD) {
+      if (password.trim().toUpperCase() === CORRECT_PASSWORD) {
         setIsAuthenticated(true);
         try { sessionStorage.setItem("persona_auth", "ok"); } catch {}
       } else {

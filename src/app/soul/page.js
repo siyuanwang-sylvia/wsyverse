@@ -7,10 +7,10 @@ const gates = [
   {
     title: "ARCHIVE",
     subtitle: "心理档案馆",
-    desc: "荣格 · 潜意识 · 禁书区",
-    href: "/soul/archive",
+    desc: "荣格心理类型理论百科",
+    href: "/soul/jung-encyclopedia",
     symbol: "✦",
-    label: "Psychological Archive",
+    label: "Jung Encyclopedia",
   },
   {
     title: "DRIFT STREAM",

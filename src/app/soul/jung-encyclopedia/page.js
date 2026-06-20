@@ -10,38 +10,48 @@ import remarkGfm from "remark-gfm";
 // 深色/浅色模式配置
 const THEMES = {
   light: {
-    bg: "bg-[#faf8f5]",
-    bgCard: "bg-[#ffffff]/80",
-    bgSidebar: "bg-[#f5f2ed]",
-    text: "text-[#2c2c2c]",
-    textSecondary: "text-[#6b6b6b]",
-    textMuted: "text-[#a0a0a0]",
-    border: "border-[#e8e4df]",
-    accent: "text-[#7a9e7e]",
-    accentBg: "bg-[#7a9e7e]/10",
-    accentBorder: "border-[#7a9e7e]/30",
-    heroGradient: "from-[#faf8f5] via-[#e8e4df]/50 to-[#d4d8c8]/30",
+    bg: "bg-[#f7f5f0]",
+    bgCard: "bg-[#ffffff]/90",
+    bgSidebar: "bg-[#f0ede6]",
+    text: "text-[#333333]",
+    textSecondary: "text-[#555555]",
+    textMuted: "text-[#888888]",
+    border: "border-[#d9d4cc]",
+    accent: "text-[#5a8a5e]",
+    accentBg: "bg-[#5a8a5e]/10",
+    accentBorder: "border-[#5a8a5e]/30",
+    heroGradient: "from-[#f7f5f0] via-[#ece8e0]/50 to-[#d8dcc8]/30",
     cardShadow: "shadow-[0_4px_20px_rgba(0,0,0,0.06)]",
     cardHoverShadow: "shadow-[0_8px_30px_rgba(0,0,0,0.1)]",
-    sidebarActive: "bg-[#7a9e7e]/20 text-[#7a9e7e]",
-    stickyTop: "bg-[#faf8f5]/90",
+    sidebarActive: "bg-[#5a8a5e]/15 text-[#3a6a3e]",
+    stickyTop: "bg-[#f7f5f0]/90",
+    // SVG 用的实际颜色值
+    svgText: "#333333",
+    svgTextSecondary: "#555555",
+    svgBorder: "#d9d4cc",
+    svgBgCard: "#ffffff",
   },
   dark: {
     bg: "bg-[#1a1a1a]",
     bgCard: "bg-[#2a2a2a]/80",
     bgSidebar: "bg-[#222222]",
     text: "text-[#e8e4df]",
-    textSecondary: "text-[#a0a0a0]",
-    textMuted: "text-[#6b6b6b]",
+    textSecondary: "text-[#b0b0b0]",
+    textMuted: "text-[#808080]",
     border: "border-[#3a3a3a]",
-    accent: "text-[#7a9e7e]",
-    accentBg: "bg-[#7a9e7e]/20",
-    accentBorder: "border-[#7a9e7e]/40",
+    accent: "text-[#8aba8e]",
+    accentBg: "bg-[#8aba8e]/15",
+    accentBorder: "border-[#8aba8e]/40",
     heroGradient: "from-[#1a1a1a] via-[#2a2a2a]/50 to-[#1a2a1a]/30",
     cardShadow: "shadow-[0_4px_20px_rgba(0,0,0,0.3)]",
     cardHoverShadow: "shadow-[0_8px_30px_rgba(0,0,0,0.5)]",
-    sidebarActive: "bg-[#7a9e7e]/30 text-[#7a9e7e]",
+    sidebarActive: "bg-[#8aba8e]/25 text-[#8aba8e]",
     stickyTop: "bg-[#1a1a1a]/90",
+    // SVG 用的实际颜色值
+    svgText: "#e8e4df",
+    svgTextSecondary: "#b0b0b0",
+    svgBorder: "#3a3a3a",
+    svgBgCard: "#2a2a2a",
   },
 };
 
@@ -139,7 +149,7 @@ const COGNITIVE_FUNCTIONS = [
     definition: "Fe 通过外部的情感氛围和社会价值来理解和影响世界，追求和谐与联系。",
     characteristics: "重视和谐、善于共情、喜欢社交、关注他人、追求共识",
     strengths: "极强的社交能力、团队协调能力、情感表达能力、冲突调解能力",
-    blindSpots: "可能忽视个人需求、过度迎合、难以说"不"、失去自我边界",
+    blindSpots: `可能忽视个人需求、过度迎合、难以说"不"、失去自我边界`,
     example: "一位团队领导敏锐地察觉到成员间的紧张关系，通过一对一沟通和团队建设活动恢复团队和谐。",
     color: "#5a8ec4",
   },
@@ -163,7 +173,7 @@ const TIMELINE = [
   { year: "1900", event: "获得医学博士学位，开始精神病学研究" },
   { year: "1907", event: "与西格蒙德·弗洛伊德首次会面，开始密切合作" },
   { year: "1912", event: "出版《力比多的象征》，与弗洛伊德关系破裂" },
-  { year: "1913-1917", event: ""直面无意识"时期，进行自我实验和梦境分析" },
+  { year: "1913-1917", event: `"直面无意识"时期，进行自我实验和梦境分析` },
   { year: "1921", event: "出版《心理类型》，系统阐述心理类型理论" },
   { year: "1933", event: "担任苏黎世联邦理工学院心理学教授" },
   { year: "1944", event: "出版《心理学与炼金术》" },
@@ -175,6 +185,7 @@ export default function JungEncyclopedia() {
   const [activeSection, setActiveSection] = useState("introduction");
   const [expandedFunction, setExpandedFunction] = useState(null);
   const [flippedCard, setFlippedCard] = useState(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
   const contentRef = useRef(null);
 
   // Markdown 内容状态
@@ -188,9 +199,16 @@ export default function JungEncyclopedia() {
 
   const currentTheme = THEMES[theme];
 
-  // 滚动监听，更新当前章节
+  // 滚动监听，更新当前章节 + 滚动进度
   useEffect(() => {
     const handleScroll = () => {
+      // 更新滚动进度
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      setScrollProgress(progress);
+
+      // 更新当前章节
       const sections = SECTIONS.map((s) => s.id);
       for (let i = sections.length - 1; i >= 0; i--) {
         const element = document.getElementById(sections[i]);
@@ -273,7 +291,18 @@ export default function JungEncyclopedia() {
   };
 
   return (
-    <div className={`min-h-screen ${currentTheme.bg} transition-colors duration-700`}>
+    <div className={`encyclopedia-page min-h-screen ${currentTheme.bg} ${currentTheme.text} transition-colors duration-700`}>
+      {/* 滚动进度条 */}
+      <div
+        className="fixed top-0 left-0 right-0 h-0.5 z-[60] transition-all duration-150"
+        style={{
+          width: `${scrollProgress}%`,
+          background: theme === "dark"
+            ? "linear-gradient(to right, #8aba8e, #6a8eaa)"
+            : "linear-gradient(to right, #5a8a5e, #4a7eaa)",
+        }}
+      />
+
       {/* 返回按钮 */}
       <motion.div
         initial={{ opacity: 0, x: -20 }}
@@ -390,9 +419,10 @@ export default function JungEncyclopedia() {
         <motion.div
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          className={`absolute bottom-8 left-1/2 -translate-x-1/2 ${currentTheme.textMuted}`}
+          className={`absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 ${currentTheme.accent}`}
         >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <span className="text-[10px] uppercase tracking-[0.3em]">向下滚动探索</span>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M12 5v14M5 12l7 7 7-7" />
           </svg>
         </motion.div>
@@ -472,7 +502,7 @@ export default function JungEncyclopedia() {
                 </div>
 
                 {/* 传记详细内容 */}
-                <div className="mt-8 prose prose-lg max-w-none">
+                <div className="mt-8 markdown-content max-w-none">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>{biographyContent}</ReactMarkdown>
                 </div>
               </div>
@@ -484,7 +514,7 @@ export default function JungEncyclopedia() {
             <FadeInSection>
               <h2 className={`text-3xl font-light ${currentTheme.text} mb-8`}>理论发展</h2>
               <div className={`${currentTheme.bgCard} backdrop-blur-lg rounded-2xl p-8 ${currentTheme.cardShadow} border ${currentTheme.border}`}>
-                <div className="prose prose-lg max-w-none">
+                <div className="markdown-content max-w-none">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>{theoryContent}</ReactMarkdown>
                 </div>
               </div>
@@ -554,7 +584,7 @@ export default function JungEncyclopedia() {
                           className="overflow-hidden"
                         >
                           <div className={`px-6 pb-6 border-t ${currentTheme.border}`}>
-                            <div className="pt-4 prose prose-lg max-w-none">
+                            <div className="pt-4 markdown-content max-w-none">
                               <ReactMarkdown remarkPlugins={[remarkGfm]}>
                                 {functionsContent[func.id] || "加载中..."}
                               </ReactMarkdown>
@@ -581,7 +611,7 @@ export default function JungEncyclopedia() {
             {/* 功能关系详细内容 */}
             <FadeInSection>
               <div className={`${currentTheme.bgCard} backdrop-blur-lg rounded-2xl p-8 ${currentTheme.cardShadow} border ${currentTheme.border} mb-8`}>
-                <div className="prose prose-lg max-w-none">
+                <div className="markdown-content max-w-none">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>{relationshipsContent}</ReactMarkdown>
                 </div>
               </div>
@@ -640,8 +670,8 @@ export default function JungEncyclopedia() {
                 <div className="flex justify-center">
                   <svg width="600" height="600" viewBox="0 0 600 600" className="max-w-full h-auto">
                     {/* 背景圆 */}
-                    <circle cx="300" cy="300" r="250" fill="none" stroke={`${currentTheme.border.includes('border-[') ? '#e8e4df' : '#3a3a3a'}`} strokeWidth="1" opacity="0.3" />
-                    <circle cx="300" cy="300" r="180" fill="none" stroke={`${currentTheme.border.includes('border-[') ? '#e8e4df' : '#3a3a3a'}`} strokeWidth="1" opacity="0.2" />
+                    <circle cx="300" cy="300" r="250" fill="none" stroke={currentTheme.svgBorder} strokeWidth="1" opacity="0.3" />
+                    <circle cx="300" cy="300" r="180" fill="none" stroke={currentTheme.svgBorder} strokeWidth="1" opacity="0.2" />
                     
                     {/* 连接线 - 对立功能对 */}
                     <line x1="300" y1="100" x2="300" y2="500" stroke="#7a9e7e" strokeWidth="2" opacity="0.6" />
@@ -651,57 +681,57 @@ export default function JungEncyclopedia() {
                     
                     {/* 功能节点 */}
                     {/* Si */}
-                    <circle cx="300" cy="100" r="30" fill={currentTheme.bgCard} stroke="#7a9e7e" strokeWidth="3" />
-                    <text x="300" y="105" textAnchor="middle" fill={currentTheme.text} fontSize="16" fontWeight="light">Si</text>
+                    <circle cx="300" cy="100" r="30" fill={currentTheme.svgBgCard} stroke="#7a9e7e" strokeWidth="3" />
+                    <text x="300" y="105" textAnchor="middle" fill={currentTheme.svgText} fontSize="16" fontWeight="light">Si</text>
                     <text x="300" y="70" textAnchor="middle" fill="#7a9e7e" fontSize="12">内倾感觉</text>
                     
                     {/* Ne */}
-                    <circle cx="300" cy="500" r="30" fill={currentTheme.bgCard} stroke="#7a9e7e" strokeWidth="3" />
-                    <text x="300" y="505" textAnchor="middle" fill={currentTheme.text} fontSize="16" fontWeight="light">Ne</text>
+                    <circle cx="300" cy="500" r="30" fill={currentTheme.svgBgCard} stroke="#7a9e7e" strokeWidth="3" />
+                    <text x="300" y="505" textAnchor="middle" fill={currentTheme.svgText} fontSize="16" fontWeight="light">Ne</text>
                     <text x="300" y="540" textAnchor="middle" fill="#7a9e7e" fontSize="12">外倾直觉</text>
                     
                     {/* Ni */}
-                    <circle cx="100" cy="300" r="30" fill={currentTheme.bgCard} stroke="#6a8eaa" strokeWidth="3" />
-                    <text x="100" y="305" textAnchor="middle" fill={currentTheme.text} fontSize="16" fontWeight="light">Ni</text>
+                    <circle cx="100" cy="300" r="30" fill={currentTheme.svgBgCard} stroke="#6a8eaa" strokeWidth="3" />
+                    <text x="100" y="305" textAnchor="middle" fill={currentTheme.svgText} fontSize="16" fontWeight="light">Ni</text>
                     <text x="60" y="270" textAnchor="middle" fill="#6a8eaa" fontSize="12">内倾直觉</text>
                     
                     {/* Se */}
-                    <circle cx="500" cy="300" r="30" fill={currentTheme.bgCard} stroke="#6a8eaa" strokeWidth="3" />
-                    <text x="500" y="305" textAnchor="middle" fill={currentTheme.text} fontSize="16" fontWeight="light">Se</text>
+                    <circle cx="500" cy="300" r="30" fill={currentTheme.svgBgCard} stroke="#6a8eaa" strokeWidth="3" />
+                    <text x="500" y="305" textAnchor="middle" fill={currentTheme.svgText} fontSize="16" fontWeight="light">Se</text>
                     <text x="540" y="270" textAnchor="middle" fill="#6a8eaa" fontSize="12">外倾感觉</text>
                     
                     {/* Ti */}
-                    <circle cx="158" cy="158" r="30" fill={currentTheme.bgCard} stroke="#8e6a6a" strokeWidth="3" />
-                    <text x="158" y="163" textAnchor="middle" fill={currentTheme.text} fontSize="16" fontWeight="light">Ti</text>
+                    <circle cx="158" cy="158" r="30" fill={currentTheme.svgBgCard} stroke="#8e6a6a" strokeWidth="3" />
+                    <text x="158" y="163" textAnchor="middle" fill={currentTheme.svgText} fontSize="16" fontWeight="light">Ti</text>
                     <text x="120" y="125" textAnchor="middle" fill="#8e6a6a" fontSize="12">内倾思考</text>
                     
                     {/* Fe */}
-                    <circle cx="442" cy="442" r="30" fill={currentTheme.bgCard} stroke="#8e6a6a" strokeWidth="3" />
-                    <text x="442" y="447" textAnchor="middle" fill={currentTheme.text} fontSize="16" fontWeight="light">Fe</text>
+                    <circle cx="442" cy="442" r="30" fill={currentTheme.svgBgCard} stroke="#8e6a6a" strokeWidth="3" />
+                    <text x="442" y="447" textAnchor="middle" fill={currentTheme.svgText} fontSize="16" fontWeight="light">Fe</text>
                     <text x="480" y="480" textAnchor="middle" fill="#8e6a6a" fontSize="12">外倾情感</text>
                     
                     {/* Fi */}
-                    <circle cx="442" cy="158" r="30" fill={currentTheme.bgCard} stroke="#8e6a8e" strokeWidth="3" />
-                    <text x="442" y="163" textAnchor="middle" fill={currentTheme.text} fontSize="16" fontWeight="light">Fi</text>
+                    <circle cx="442" cy="158" r="30" fill={currentTheme.svgBgCard} stroke="#8e6a8e" strokeWidth="3" />
+                    <text x="442" y="163" textAnchor="middle" fill={currentTheme.svgText} fontSize="16" fontWeight="light">Fi</text>
                     <text x="480" y="125" textAnchor="middle" fill="#8e6a8e" fontSize="12">内倾情感</text>
                     
                     {/* Te */}
-                    <circle cx="158" cy="442" r="30" fill={currentTheme.bgCard} stroke="#8e6a8e" strokeWidth="3" />
-                    <text x="158" y="447" textAnchor="middle" fill={currentTheme.text} fontSize="16" fontWeight="light">Te</text>
+                    <circle cx="158" cy="442" r="30" fill={currentTheme.svgBgCard} stroke="#8e6a8e" strokeWidth="3" />
+                    <text x="158" y="447" textAnchor="middle" fill={currentTheme.svgText} fontSize="16" fontWeight="light">Te</text>
                     <text x="120" y="480" textAnchor="middle" fill="#8e6a8e" fontSize="12">外倾思考</text>
                     
                     {/* 图例 */}
                     <rect x="50" y="560" width="20" height="3" fill="#7a9e7e" />
-                    <text x="80" y="565" fill={currentTheme.textSecondary} fontSize="11">Si-Ne 对</text>
+                    <text x="80" y="565" fill={currentTheme.svgTextSecondary} fontSize="11">Si-Ne 对</text>
                     
                     <rect x="200" y="560" width="20" height="3" fill="#6a8eaa" />
-                    <text x="230" y="565" fill={currentTheme.textSecondary} fontSize="11">Ni-Se 对</text>
+                    <text x="230" y="565" fill={currentTheme.svgTextSecondary} fontSize="11">Ni-Se 对</text>
                     
                     <rect x="350" y="560" width="20" height="3" fill="#8e6a6a" />
-                    <text x="380" y="565" fill={currentTheme.textSecondary} fontSize="11">Ti-Fe 对</text>
+                    <text x="380" y="565" fill={currentTheme.svgTextSecondary} fontSize="11">Ti-Fe 对</text>
                     
                     <rect x="480" y="560" width="20" height="3" fill="#8e6a8e" />
-                    <text x="510" y="565" fill={currentTheme.textSecondary} fontSize="11">Fi-Te 对</text>
+                    <text x="510" y="565" fill={currentTheme.svgTextSecondary} fontSize="11">Fi-Te 对</text>
                   </svg>
                 </div>
               </div>
@@ -734,7 +764,7 @@ export default function JungEncyclopedia() {
             <FadeInSection>
               <h2 className={`text-3xl font-light ${currentTheme.text} mb-8`}>实际应用</h2>
               <div className={`${currentTheme.bgCard} backdrop-blur-lg rounded-2xl p-8 ${currentTheme.cardShadow} border ${currentTheme.border}`}>
-                <div className="prose prose-lg max-w-none">
+                <div className="markdown-content max-w-none">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>{applicationsContent}</ReactMarkdown>
                 </div>
               </div>
@@ -746,7 +776,7 @@ export default function JungEncyclopedia() {
             <FadeInSection>
               <h2 className={`text-3xl font-light ${currentTheme.text} mb-8`}>延伸资源</h2>
               <div className={`${currentTheme.bgCard} backdrop-blur-lg rounded-2xl p-8 ${currentTheme.cardShadow} border ${currentTheme.border}`}>
-                <div className="prose prose-lg max-w-none">
+                <div className="markdown-content max-w-none">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>{resourcesContent}</ReactMarkdown>
                 </div>
               </div>
