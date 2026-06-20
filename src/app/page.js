@@ -2,19 +2,21 @@
 
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 
 /* ═══════════════════════════════════════════════════
-   背景星空粒子
+   背景星空粒子（客户端生成，避免 SSR hydration 不匹配）
    ═══════════════════════════════════════════════════ */
-const PARTICLES = Array.from({ length: 60 }, (_, i) => ({
-  x: Math.random() * 100,
-  y: Math.random() * 100,
-  s: Math.random() * 1.5 + 0.3,
-  o: Math.random() * 0.5 + 0.1,
-  d: Math.random() * 8 + 4,
-  delay: Math.random() * 5,
-}));
+function generateParticles(count = 60) {
+  return Array.from({ length: count }, () => ({
+    x: Math.random() * 100,
+    y: Math.random() * 100,
+    s: Math.random() * 1.5 + 0.3,
+    o: Math.random() * 0.5 + 0.1,
+    d: Math.random() * 8 + 4,
+    delay: Math.random() * 5,
+  }));
+}
 
 /* ═══════════════════════════════════════════════════
    四道世界之门 — 数据
@@ -84,6 +86,11 @@ const GATES = [
 export default function Home() {
   const [hoveredGate, setHoveredGate] = useState(null);
   const [entering, setEntering] = useState(null);
+  const [particles, setParticles] = useState([]);
+
+  useEffect(() => {
+    setParticles(generateParticles(60));
+  }, []);
 
   const handleEnter = useCallback((gateId) => {
     setEntering(gateId);
@@ -97,7 +104,7 @@ export default function Home() {
     <main className="h-screen w-screen overflow-hidden relative bg-[#05060a] text-[#f4e6c3] select-none">
 
       {/* ── 背景星空 ── */}
-      {PARTICLES.map((p, i) => (
+      {particles.map((p, i) => (
         <motion.div
           key={i}
           className="absolute rounded-full bg-white"

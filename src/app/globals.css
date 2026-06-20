@@ -415,10 +415,19 @@ body::before {
   opacity: 1;
 }
 
-/* 百科页面允许滚动（覆盖 body overflow: hidden） */
-
-.encyclopedia-page {
+/* ═════════════════════════════════════════
+   滚动修复 — 覆盖全局 body overflow: hidden
+   所有内容页面的 <main> 添加 scrollable-page 即可启用滚动
+   ═════════════════════════════════════════ */
+body:has(.scrollable-page) {
   overflow-y: auto !important;
   height: auto !important;
-  min-height: 100vh;
+  overflow-x: hidden !important;
+}
+
+/* 保留旧选择器向后兼容 */
+body:has(.encyclopedia-page) {
+  overflow-y: auto !important;
+  height: auto !important;
+  overflow-x: hidden !important;
 }

@@ -123,7 +123,7 @@ export default function VaultPage() {
   /* ── 加载中 ── */
   if (loading || !shelves) {
     return (
-      <main className="relative min-h-screen overflow-hidden bg-[#05060a] text-[#f4e6c3] flex items-center justify-center">
+      <main className="relative min-h-screen scrollable-page bg-[#05060a] text-[#f4e6c3] flex items-center justify-center">
         {backBtn}
         <motion.div
           animate={{ opacity: [0.2, 0.5, 0.2] }}
@@ -140,7 +140,7 @@ export default function VaultPage() {
 
   if (!activeShelf) {
     return (
-      <main className="relative min-h-screen overflow-hidden bg-[#05060a] text-[#f4e6c3]">
+      <main className="relative min-h-screen scrollable-page bg-[#05060a] text-[#f4e6c3]">
         {backBtn}
 
         {/* 背景体积光 */}
@@ -208,7 +208,7 @@ export default function VaultPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 + i * 0.08, duration: 0.8 }}
               whileHover={{ y: -4 }}
-              className="group relative overflow-hidden rounded-2xl border p-6 text-left transition-all duration-700 hover:border-[#8d7753]/35"
+              className="group relative scrollable-page rounded-2xl border p-6 text-left transition-all duration-700 hover:border-[#8d7753]/35"
               style={{ backgroundColor: "rgba(16,14,10,0.85)", borderColor: "rgba(141,119,83,0.18)" }}
             >
               {/* hover 光晕 */}
@@ -255,7 +255,7 @@ export default function VaultPage() {
   const fileCount = files.length;
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#05060a] text-[#f4e6c3]">
+    <main className="relative min-h-screen scrollable-page bg-[#05060a] text-[#f4e6c3]">
       {backBtn}
 
       <div className="relative z-10 max-w-4xl mx-auto px-6 py-28">
@@ -374,11 +374,11 @@ function FileCard({ file, index }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.06, duration: 0.6 }}
-      className="group relative overflow-hidden rounded-xl border border-[#8d7753]/18 bg-[#0b1020]/80 backdrop-blur-sm hover:border-[#8d7753]/35 transition-all duration-500"
+      className="group relative scrollable-page rounded-xl border border-[#8d7753]/18 bg-[#0b1020]/80 backdrop-blur-sm hover:border-[#8d7753]/35 transition-all duration-500"
     >
       {/* PDF / DOC 图标区 */}
       {(ft === "pdf" || ft === "doc") && (
-        <div className="relative h-20 flex items-center justify-center bg-[#0a0d18] overflow-hidden">
+        <div className="relative h-20 flex items-center justify-center bg-[#0a0d18] scrollable-page">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(180,60,60,0.04)_0%,transparent_70%)]" />
           <span className={`text-2xl font-serif ${ft === "pdf" ? "text-red-400/20" : "text-blue-400/20"} tracking-[0.1em]`}>
             {ft.toUpperCase()}

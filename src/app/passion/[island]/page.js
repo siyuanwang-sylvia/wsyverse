@@ -1,14 +1,19 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 
 /* ═══════════════════ 宇宙语言 ═══════════════════ */
 const TYPE_CONFIG = {
-  video:    { en: "Videos",    cn: "视频",   icon: "△", desc: "Moving pieces of your expedition" },
-  image:    { en: "Photos",    cn: "照片",   icon: "◇", desc: "Visual memories frozen in time" },
-  document: { en: "Documents", cn: "文档",   icon: "□", desc: "Preserved documents and records" },
+  video:    { en: "Fragments", cn: "碎片", icon: "△", desc: "Moving pieces of your expedition" },
+  image:    { en: "Echoes",    cn: "回响", icon: "◇", desc: "Visual memories frozen in time" },
+  pdf:      { en: "Archives",  cn: "档案", icon: "□", desc: "Preserved documents and records" },
+  doc:      { en: "Archives",  cn: "档案", icon: "□", desc: "Preserved documents and records" },
+  text:     { en: "Notes",     cn: "野记", icon: "▽", desc: "Thoughts and observations" },
+  audio:    { en: "Signals",   cn: "信号", icon: "○", desc: "Resonant frequencies captured" },
+  other:    { en: "Relics",    cn: "遗物", icon: "☆", desc: "Mysterious artifacts" },
 };
 
 const EVO_NAMES = {
@@ -67,13 +72,15 @@ const THEME_CONFIGS = {
   },
 };
 
-export default function IslandPage({ params }) {
-  const { island: islandId } = params;
+export default function IslandPage() {
+  const { island: islandId } = useParams();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(null);
   const [activeSection, setActiveSection] = useState(null);
   const [showArrival, setShowArrival] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterType, setFilterType] = useState("all");
 
   useEffect(() => {
     fetch(`/api/passion-lab/${islandId}`)
@@ -94,10 +101,12 @@ export default function IslandPage({ params }) {
     return THEME_CONFIGS[data.theme.atmosphere] || THEME_CONFIGS["deep-cosmos"];
   }, [data]);
 
-  const particles = useMemo(
-    () => generateParticles(30, theme.particleColor),
-    [theme.particleColor]
-  );
+  const [particles, setParticles] = useState([]);
+
+  useEffect(() => {
+    // 客户端生成粒子，避免 SSR hydration 不匹配
+    setParticles(generateParticles(30, theme.particleColor));
+  }, [theme.particleColor]);
 
   if (loading) {
     return (
@@ -133,17 +142,34 @@ export default function IslandPage({ params }) {
   const sections = data.sections || [];
   const instruments = data.instruments || [];
 
-  // 按三大类分组：视频、照片、文档
-  const grouped = { video: [], image: [], document: [] };
-  data.files.forEach((f) => {
-    if (f.type === "video") grouped.video.push(f);
-    else if (f.type === "image") grouped.image.push(f);
-    else if (f.type === "pdf" || f.type === "doc" || f.type === "text") grouped.document.push(f);
-  });
-  const activeTypes = Object.keys(grouped).filter((t) => grouped[t].length > 0);
+  // 过滤 + 搜索
+  const displayFiles = useMemo(() => {
+    let files = data.files || [];
+    if (filterType !== "all") {
+      if (filterType === "document") {
+        files = files.filter(f => ["pdf","doc","text"].includes(f.type));
+      } else {
+        files = files.filter(f => f.type === filterType);
+      }
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      files = files.filter(f => f.name.toLowerCase().includes(q));
+    }
+    return files;
+  }, [data.files, filterType, searchQuery]);
+
+  // 可用类型 tab
+  const availableTypes = useMemo(() => {
+    const types = new Set(data.files?.map(f => {
+      if (["pdf","doc","text"].includes(f.type)) return "document";
+      return f.type;
+    }) || []);
+    return ["all", ...Array.from(types)];
+  }, [data.files]);
 
   return (
-    <main className="min-h-screen text-[#b8c8d8]" style={{ background: theme.bg }}>
+    <main className="min-h-screen scrollable-page text-[#b8c8d8]" style={{ background: theme.bg }}>
       {/* ═══ 到达动画 ═══ */}
       <AnimatePresence>
         {showArrival && (
@@ -423,37 +449,71 @@ export default function IslandPage({ params }) {
           </motion.div>
         )}
 
-        {/* 内容类型导航 */}
-        {activeTypes.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 4, duration: 1 }}
-            className="mt-8 flex flex-wrap justify-center gap-2"
-          >
-            {activeTypes.map((type) => {
-              const cfg = TYPE_CONFIG[type] || TYPE_CONFIG.other;
-              return (
-                <button
-                  key={type}
-                  onClick={() => setActiveSection(activeSection === type ? null : type)}
-                  className={`px-4 py-2 rounded-lg text-[9px] uppercase tracking-[0.2em] border transition-all duration-500 ${
-                    activeSection === type
-                      ? "bg-white/[0.06] text-[#c0d0e0] border-white/[0.12]"
-                      : "bg-transparent text-[#5a7a8a] border-white/[0.05] hover:bg-white/[0.03] hover:text-[#8a9aaa]"
-                  }`}
-                >
-                  {cfg.icon} {cfg.en} ({grouped[type].length})
-                </button>
-              );
-            })}
-          </motion.div>
-        )}
+        {/* 媒体类型筛选 tabs */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 3.6, duration: 1 }}
+          className="mt-10 flex flex-wrap justify-center gap-2"
+        >
+          {availableTypes.map((type) => {
+            const cfg = type === "all"
+              ? { en: "All", cn: "全部", icon: "◎" }
+              : TYPE_CONFIG[type] || TYPE_CONFIG.other;
+            const count = type === "all"
+              ? (data.files?.length || 0)
+              : displayFiles.filter(f => {
+                  if (type === "document") return ["pdf","doc","text"].includes(f.type);
+                  return f.type === type;
+                }).length;
+            return (
+              <button
+                key={type}
+                onClick={() => setFilterType(type)}
+                className={`px-4 py-2 rounded-lg text-[9px] uppercase tracking-[0.15em] border transition-all duration-500 flex items-center gap-1.5 ${
+                  filterType === type
+                    ? "bg-white/[0.06] text-[#c0d0e0] border-white/[0.12]"
+                    : "bg-transparent text-[#5a7a8a] border-white/[0.05] hover:bg-white/[0.03] hover:text-[#8a9aaa]"
+                }`}
+              >
+                <span>{cfg.icon}</span>
+                <span>{cfg.cn}</span>
+                <span className="opacity-40">{count}</span>
+              </button>
+            );
+          })}
+        </motion.div>
+
+        {/* 检索框 */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 3.8, duration: 1 }}
+          className="mt-5 flex justify-center"
+        >
+          <div className="relative w-full max-w-xs">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="寻觅…"
+              className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-xs text-[#8a9aaa] placeholder:text-[#3a5a6a] focus:outline-none focus:border-white/[0.12] transition-all duration-500"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#4a6a7a] hover:text-[#8a9aaa] text-sm"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+        </motion.div>
       </section>
 
-      {/* ═══════════════════ 内容区 ═══════════════════ */}
-      <section className="px-6 pb-32 max-w-6xl mx-auto">
-        {data.files.length === 0 ? (
+      {/* ═══════════════════ 漂浮内容区 — Masonry 混合布局 ═══════════════════ */}
+      <section className="px-4 md:px-6 pb-32 max-w-7xl mx-auto">
+        {displayFiles.length === 0 ? (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -468,95 +528,37 @@ export default function IslandPage({ params }) {
               <div className="absolute inset-3 rounded-full border border-white/[0.03]" />
             </motion.div>
             <h3 className="font-serif text-xl tracking-[0.12em] text-[#5a7a8a] mb-4">
-              This island is sleeping
+              {searchQuery ? "无匹配内容" : "这座岛屿还在沉睡"}
             </h3>
             <p className="text-sm leading-8 text-[#3a5a6a] mb-6">
-              Drop files into{" "}
-              <code className="bg-white/[0.03] px-2 py-0.5 rounded text-[#5a7a8a] text-xs">
-                public/passion/{islandId}/
-              </code>
-              <br />
-              and watch it awaken.
+              {searchQuery
+                ? "试试其他关键词"
+                : <>将文件放入{" "}
+                  <code className="bg-white/[0.03] px-2 py-0.5 rounded text-[#5a7a8a] text-xs">
+                    public/passion/{islandId}/photos/ 或 videos/ 或 audio/ 或 files/
+                  </code></>
+              }
             </p>
-            {sections.length > 0 && (
-              <div className="mt-8 text-left max-w-sm mx-auto">
-                <p className="text-[8px] uppercase tracking-[0.3em] text-[#3a5a5a] mb-3 text-center">
-                  Ready for exploration
-                </p>
-                <div className="grid grid-cols-2 gap-1.5">
-                  {sections.map((sec) => (
-                    <div key={sec.id} className="flex items-center gap-1.5 px-2 py-1.5 rounded text-[9px] text-[#4a6a7a] bg-white/[0.015]">
-                      <span>{sec.icon}</span>
-                      <span>{sec.nameCN || sec.name}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </motion.div>
         ) : (
-          <div className="space-y-16">
-            {activeTypes.map((type) => {
-              if (activeSection && activeSection !== type) return null;
-              const files = grouped[type] || [];
-              const cfg = TYPE_CONFIG[type] || TYPE_CONFIG.other;
-              if (files.length === 0) return null;
-
-              return (
-                <motion.div
-                  key={type}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  transition={{ duration: 0.8 }}
-                >
-                  {/* 区块头 */}
-                  <div className="flex items-center gap-4 mb-6">
-                    <motion.span
-                      className="text-xl"
-                      animate={{ opacity: [0.5, 0.9, 0.5] }}
-                      transition={{ duration: 3, repeat: Infinity }}
-                      style={{ color: theme.accentGlow }}
-                    >
-                      {cfg.icon}
-                    </motion.span>
-                    <div>
-                      <h2 className="font-serif text-base tracking-[0.1em] text-[#a0b8c8]">{cfg.en}</h2>
-                      <p className="text-[9px] text-[#5a7a8a] mt-0.5">{cfg.desc}</p>
-                    </div>
-                    <div className="ml-auto">
-                      <span className="text-[8px] uppercase tracking-[0.2em] text-[#3a5a6a] px-2 py-1 rounded-full bg-white/[0.02] border border-white/[0.04]">
-                        {files.length} {type === "image" ? "echoes" : type === "video" ? "fragments" : type === "text" ? "notes" : type === "audio" ? "signals" : "records"}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="h-px bg-gradient-to-r from-white/[0.05] via-white/[0.02] to-transparent mb-6" />
-
-                  <div className="columns-1 md:columns-2 lg:columns-3 gap-5 [column-fill:_balance]">
-                    {files.map((file, idx) => (
-                      <motion.div
-                        key={file.name}
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.5, delay: Math.min(idx * 0.04, 0.4) }}
-                        className="mb-5 break-inside-avoid"
-                      >
-                        <RelicCard
-                          file={file}
-                          type={type}
-                          islandColor={data.color}
-                          islandGlow={data.glow}
-                          theme={theme}
-                          onImageClick={setSelectedImage}
-                        />
-                      </motion.div>
-                    ))}
-                  </div>
-                </motion.div>
-              );
-            })}
+          <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 [column-fill:_balance]">
+            {displayFiles.map((file, idx) => (
+              <motion.div
+                key={file.path}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-30px" }}
+                transition={{ duration: 0.5, delay: Math.min(idx * 0.03, 0.5) }}
+                className="mb-4 break-inside-avoid"
+              >
+                <FloatingCard
+                  file={file}
+                  islandColor={data.color}
+                  islandGlow={data.glow}
+                  onImageClick={setSelectedImage}
+                />
+              </motion.div>
+            ))}
           </div>
         )}
       </section>
@@ -599,20 +601,67 @@ export default function IslandPage({ params }) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   遗物卡片
+   漂浮卡片 — 每种类型独立渲染，视频有缩略图
    ═══════════════════════════════════════════════════════════════ */
-function RelicCard({ file, type, islandColor, islandGlow, theme, onImageClick }) {
-  const [expanded, setExpanded] = useState(false);
+function FloatingCard({ file, islandColor, islandGlow, onImageClick }) {
+  // 确定性"随机"高度，基于文件名 hash
+  const hash = useMemo(() => {
+    let h = 0;
+    for (let i = 0; i < (file.name || "").length; i++) h = ((h << 5) - h + file.name.charCodeAt(i)) | 0;
+    return Math.abs(h);
+  }, [file.name]);
 
-  let hash = 0;
-  for (let i = 0; i < file.name.length; i++) hash = ((hash << 5) - hash + file.name.charCodeAt(i)) | 0;
-  const imgHeight = 180 + Math.abs(hash % 120);
+  const baseCard = "group relative overflow-hidden rounded-2xl bg-white/[0.015] backdrop-blur-sm border border-white/[0.05] hover:border-white/[0.1] transition-all duration-500 cursor-pointer";
 
-  if (type === "image") {
+  /* ── 视频 ── */
+  if (file.type === "video") {
+    const vidHeight = 220 + (hash % 180);
+    return (
+      <motion.div whileHover={{ y: -4, scale: 1.01 }} className={baseCard}>
+        <div className="relative" style={{ height: vidHeight }}>
+          <video
+            src={file.path}
+            className="w-full h-full object-cover"
+            muted
+            preload="metadata"
+            playsInline
+            onMouseEnter={(e) => { e.target.play?.(); }}
+            onMouseLeave={(e) => { e.target.pause?.(); e.target.currentTime = 0; }}
+          />
+          {/* 覆盖层 */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent pointer-events-none" />
+          {/* 播放图标 */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <motion.div
+              className="w-14 h-14 rounded-full flex items-center justify-center"
+              style={{ background: `${islandGlow || "#4a7aaa"}20`, border: `1px solid ${islandGlow || "#4a7aaa"}30` }}
+              animate={{ scale: [1, 1.08, 1], opacity: [0.7, 1, 0.7] }}
+              transition={{ duration: 3, repeat: Infinity }}
+            >
+              <span className="text-2xl text-white/70">▶</span>
+            </motion.div>
+          </div>
+        </div>
+        <div className="p-3.5">
+          <p className="text-[10px] text-[#b0c0d0] truncate mb-1">{file.name}</p>
+          <div className="flex items-center justify-between">
+            <span className="text-[8px] uppercase tracking-[0.12em] text-[#4a6a7a]">
+              {(file.size / 1024 / 1024).toFixed(1)} MB
+            </span>
+            <span className="text-[7px] text-[#3a5a6a]">△ Fragment</span>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+
+  /* ── 照片 ── */
+  if (file.type === "image") {
+    const imgHeight = 200 + (hash % 200);
     return (
       <motion.div
-        whileHover={{ y: -3, scale: 1.01 }}
-        className="group relative overflow-hidden rounded-xl bg-white/[0.015] backdrop-blur-sm border border-white/[0.05] cursor-pointer"
+        whileHover={{ y: -4, scale: 1.01 }}
+        className={baseCard}
         onClick={() => onImageClick(file.path)}
       >
         <div className="relative overflow-hidden" style={{ height: imgHeight }}>
@@ -623,32 +672,40 @@ function RelicCard({ file, type, islandColor, islandGlow, theme, onImageClick })
             <p className="text-xs text-white/80 truncate">{file.name}</p>
           </div>
         </div>
-        <div className="p-3">
-          <div className="flex items-center justify-between">
-            <p className="text-[10px] text-[#5a7a8a] truncate max-w-[70%]">{file.name}</p>
-            <p className="text-[8px] text-[#3a5a6a]">{(file.size / 1024).toFixed(1)} KB</p>
+        <div className="p-3.5">
+          <p className="text-[10px] text-[#b0c0d0] truncate">{file.name}</p>
+          <div className="flex items-center justify-between mt-1">
+            <span className="text-[8px] text-[#3a5a6a]">{(file.size / 1024).toFixed(1)} KB</span>
+            <span className="text-[7px] text-[#3a5a6a]">◇ Echo</span>
           </div>
         </div>
       </motion.div>
     );
   }
 
-  if (type === "video") {
+  /* ── 文档 (PDF/DOC) ── */
+  if (file.type === "pdf" || file.type === "doc") {
     return (
-      <motion.div whileHover={{ y: -3 }}
-        className="group relative overflow-hidden rounded-xl bg-white/[0.015] backdrop-blur-sm border border-white/[0.05] p-5">
-        <div className="flex items-start gap-4">
-          <motion.div className="flex-shrink-0 w-14 h-14 rounded-lg flex items-center justify-center text-2xl"
-            style={{ background: `${islandGlow || "#2a4a7a"}12` }}
-            animate={{ opacity: [0.6, 1, 0.6] }}
-            transition={{ duration: 3, repeat: Infinity }}
-          >{"\u25B3"}</motion.div>
-          <div className="flex-1 min-w-0">
-            <h4 className="text-xs text-[#b0c0d0] truncate mb-1">{file.name}</h4>
-            <p className="text-[9px] text-[#3a5a6a] mb-3">Fragment &middot; {(file.size / 1024 / 1024).toFixed(1)} MB</p>
-            <a href={file.path} target="_blank" rel="noopener noreferrer"
-              className="inline-block px-3 py-1.5 rounded-lg bg-white/[0.03] text-[9px] uppercase tracking-[0.15em] text-[#7a9aaa] hover:bg-white/[0.06] transition-all duration-500 border border-white/[0.05]">
-              Play Fragment
+      <motion.div whileHover={{ y: -4, scale: 1.01 }} className={baseCard}>
+        <div className="p-5">
+          <div className="flex items-start gap-3 mb-3">
+            <div className="flex-shrink-0 w-10 h-12 rounded-lg flex items-center justify-center"
+              style={{ background: `${islandGlow || "#4a7aaa"}10` }}>
+              <span className="text-lg opacity-60">□</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] text-[#b0c0d0] truncate leading-relaxed">{file.name}</p>
+              <p className="text-[8px] text-[#4a6a7a] mt-0.5">{(file.size / 1024).toFixed(1)} KB</p>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <a href={file.path} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}
+              className="flex-1 text-center px-3 py-2 rounded-lg bg-white/[0.03] text-[9px] text-[#7a9aaa] hover:bg-white/[0.06] transition-all duration-300 border border-white/[0.05]">
+              Read
+            </a>
+            <a href={file.path} download onClick={(e) => e.stopPropagation()}
+              className="flex-1 text-center px-3 py-2 rounded-lg border border-white/[0.05] text-[9px] text-[#5a7a8a] hover:bg-white/[0.03] transition-all duration-300">
+              Download
             </a>
           </div>
         </div>
@@ -656,110 +713,93 @@ function RelicCard({ file, type, islandColor, islandGlow, theme, onImageClick })
     );
   }
 
-  if (type === "pdf" || type === "doc") {
+  /* ── 文本 ── */
+  if (file.type === "text") {
     return (
-      <motion.div whileHover={{ y: -3 }}
-        className="group relative overflow-hidden rounded-xl bg-white/[0.015] backdrop-blur-sm border border-white/[0.05] p-5">
-        <div className="flex items-start gap-4">
-          <div className="flex-shrink-0 w-14 h-16 rounded-lg flex items-center justify-center text-2xl"
-            style={{ background: `${islandGlow || "#2a4a7a"}12` }}>
-            {"\u25A1"}
-          </div>
-          <div className="flex-1 min-w-0">
-            <h4 className="text-xs text-[#b0c0d0] truncate mb-1">{file.name}</h4>
-            <p className="text-[9px] text-[#3a5a6a] mb-3">Archive &middot; {(file.size / 1024).toFixed(1)} KB</p>
-            <div className="flex gap-2">
-              <a href={file.path} target="_blank" rel="noopener noreferrer"
-                className="px-3 py-1.5 rounded-lg bg-white/[0.03] text-[9px] uppercase tracking-[0.15em] text-[#7a9aaa] hover:bg-white/[0.06] transition-all duration-500 border border-white/[0.05]">
-                Read
-              </a>
-              <a href={file.path} download
-                className="px-3 py-1.5 rounded-lg border border-white/[0.05] text-[9px] uppercase tracking-[0.15em] text-[#5a7a8a] hover:bg-white/[0.03] transition-all duration-500">
-                Download
-              </a>
+      <motion.div whileHover={{ y: -4, scale: 1.01 }} className={baseCard}>
+        <div className="p-5">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center bg-white/[0.02]">
+              <span className="text-lg opacity-60">▽</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] text-[#b0c0d0] truncate leading-relaxed">{file.name}</p>
+              <p className="text-[8px] text-[#4a6a7a] mt-0.5">{(file.size / 1024).toFixed(1)} KB</p>
             </div>
           </div>
+          <div className="mt-4">
+            <a href={file.path} download onClick={(e) => e.stopPropagation()}
+              className="block text-center px-3 py-2 rounded-lg bg-white/[0.02] text-[9px] text-[#7a9aaa] hover:bg-white/[0.05] transition-all duration-300 border border-white/[0.04]">
+              Download Note
+            </a>
+          </div>
         </div>
       </motion.div>
     );
   }
 
-  if (type === "text") {
+  /* ── 音频 ── */
+  if (file.type === "audio") {
+    const barCount = 5 + (hash % 8);
     return (
-      <motion.div whileHover={{ y: -3 }}
-        className="group relative overflow-hidden rounded-xl bg-white/[0.015] backdrop-blur-sm border border-white/[0.05] p-5 cursor-pointer"
-        onClick={() => setExpanded(!expanded)}>
-        <div className="flex items-start gap-4 mb-3">
-          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-white/[0.03] flex items-center justify-center text-lg">
-            {"\u25BD"}
-          </div>
-          <div className="flex-1 min-w-0">
-            <h4 className="text-xs text-[#b0c0d0] truncate">{file.name}</h4>
-            <p className="text-[9px] text-[#3a5a6a] mt-0.5">Field Note &middot; {(file.size / 1024).toFixed(1)} KB</p>
-          </div>
-          <motion.span animate={{ rotate: expanded ? 180 : 0 }} className="text-[#3a5a6a] text-xs">
-            &#x25BC;
-          </motion.span>
-        </div>
-        <AnimatePresence>
-          {expanded && (
-            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
-              <div className="pt-3 border-t border-white/[0.04]">
-                <p className="text-[10px] leading-6 text-[#5a7a8a] mb-3">
-                  Download to read the full field note.
-                </p>
-                <a href={file.path} download
-                  className="inline-block px-3 py-1.5 rounded-lg bg-white/[0.03] text-[9px] uppercase tracking-[0.15em] text-[#7a9aaa] hover:bg-white/[0.06] transition-all duration-500 border border-white/[0.05]">
-                  Download Note
-                </a>
-              </div>
+      <motion.div whileHover={{ y: -4, scale: 1.01 }} className={baseCard}>
+        <div className="p-5">
+          <div className="flex items-center gap-3 mb-3">
+            <motion.div
+              animate={{ scale: [1, 1.06, 1] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center"
+              style={{ background: `${islandGlow || "#4a7aaa"}10`, border: `1px solid ${islandGlow || "#4a7aaa"}18` }}
+            >
+              <span className="text-lg opacity-60">○</span>
             </motion.div>
-          )}
-        </AnimatePresence>
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] text-[#b0c0d0] truncate">{file.name}</p>
+              <p className="text-[8px] text-[#4a6a7a] mt-0.5">{(file.size / 1024 / 1024).toFixed(1)} MB</p>
+            </div>
+          </div>
+          {/* 频谱条 */}
+          <div className="flex items-end gap-[2px] h-8 justify-center">
+            {Array.from({ length: barCount }).map((_, i) => (
+              <motion.div
+                key={i}
+                className="w-1 rounded-full"
+                style={{ background: `${islandGlow || "#4a7aaa"}30` }}
+                animate={{ height: [6 + (i % 4) * 2, 18 + (i % 6) * 3, 6 + (i % 4) * 2] }}
+                transition={{ duration: 1.2 + (i * 0.15), repeat: Infinity, ease: "easeInOut", delay: i * 0.08 }}
+              />
+            ))}
+          </div>
+          <div className="mt-3">
+            <a href={file.path} download onClick={(e) => e.stopPropagation()}
+              className="block text-center px-3 py-2 rounded-lg bg-white/[0.02] text-[9px] text-[#7a9aaa] hover:bg-white/[0.05] transition-all duration-300 border border-white/[0.04]">
+              Download Signal
+            </a>
+          </div>
+        </div>
       </motion.div>
     );
   }
 
-  if (type === "audio") {
-    return (
-      <motion.div whileHover={{ y: -3 }}
-        className="group relative overflow-hidden rounded-xl bg-white/[0.015] backdrop-blur-sm border border-white/[0.05] p-5">
-        <div className="flex items-center gap-4">
-          <motion.div
-            animate={{ scale: [1, 1.08, 1] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center text-xl"
-            style={{ background: `${islandGlow || "#2a4a7a"}12`, border: `1px solid ${islandGlow || "#2a4a7a"}15` }}
-          >{"\u25CB"}</motion.div>
-          <div className="flex-1 min-w-0">
-            <h4 className="text-xs text-[#b0c0d0] truncate">{file.name}</h4>
-            <p className="text-[9px] text-[#3a5a6a] mt-0.5">Signal &middot; {(file.size / 1024 / 1024).toFixed(1)} MB</p>
+  /* ── 其他 ── */
+  return (
+    <motion.div whileHover={{ y: -4, scale: 1.01 }} className={baseCard}>
+      <div className="p-5">
+        <div className="flex items-center gap-3">
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center bg-white/[0.02]">
+            <span className="text-lg opacity-60">☆</span>
           </div>
-          <a href={file.path} download
-            className="flex-shrink-0 px-3 py-1.5 rounded-lg bg-white/[0.03] text-[9px] uppercase tracking-[0.15em] text-[#7a9aaa] hover:bg-white/[0.06] transition-all duration-500 border border-white/[0.05]">
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] text-[#b0c0d0] truncate">{file.name}</p>
+            <p className="text-[8px] text-[#4a6a7a] mt-0.5">{(file.size / 1024).toFixed(1)} KB</p>
+          </div>
+        </div>
+        <div className="mt-4">
+          <a href={file.path} download onClick={(e) => e.stopPropagation()}
+            className="block text-center px-3 py-2 rounded-lg bg-white/[0.02] text-[9px] text-[#7a9aaa] hover:bg-white/[0.05] transition-all duration-300 border border-white/[0.04]">
             Download
           </a>
         </div>
-      </motion.div>
-    );
-  }
-
-  return (
-    <motion.div whileHover={{ y: -3 }}
-      className="group relative overflow-hidden rounded-xl bg-white/[0.015] backdrop-blur-sm border border-white/[0.05] p-5">
-      <div className="flex items-center gap-4">
-        <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-white/[0.02] flex items-center justify-center text-lg">
-          {"\u2606"}
-        </div>
-        <div className="flex-1 min-w-0">
-          <h4 className="text-xs text-[#b0c0d0] truncate">{file.name}</h4>
-          <p className="text-[9px] text-[#3a5a6a] mt-0.5">Relic &middot; {(file.size / 1024).toFixed(1)} KB</p>
-        </div>
-        <a href={file.path} download
-          className="flex-shrink-0 px-3 py-1.5 rounded-lg bg-white/[0.03] text-[9px] uppercase tracking-[0.15em] text-[#7a9aaa] hover:bg-white/[0.06] transition-all duration-500 border border-white/[0.05]">
-          Download
-        </a>
       </div>
     </motion.div>
   );

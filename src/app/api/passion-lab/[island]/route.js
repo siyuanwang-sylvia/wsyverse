@@ -88,6 +88,7 @@ function scanIsland(islandId) {
       if (f.isDirectory()) {
         walk(full, rel);
       } else {
+        if (f.name === ".gitkeep" || f.name === "island.json") return;
         const ext = f.name.split(".").pop().toLowerCase();
         let type = "other";
         if (["jpg", "jpeg", "png", "webp", "gif", "avif"].includes(ext)) type = "image";

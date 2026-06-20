@@ -4,14 +4,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-/* ═══════════════════ 星空 ═══════════════════ */
-const STARS = Array.from({ length: 80 }, (_, i) => ({
-  x: Math.random() * 100,
-  y: Math.random() * 100,
-  s: Math.random() * 2 + 0.5,
-  o: Math.random() * 0.6 + 0.2,
-  d: Math.random() * 6 + 3,
-}));
+/* ═══════════════════ 星空（客户端生成，避免 SSR hydration 不匹配） ═══════════════════ */
+function generateStars(count = 80) {
+  return Array.from({ length: count }, () => ({
+    x: Math.random() * 100,
+    y: Math.random() * 100,
+    s: Math.random() * 2 + 0.5,
+    o: Math.random() * 0.6 + 0.2,
+    d: Math.random() * 6 + 3,
+  }));
+}
 
 /* ═══════════════════ 星云 ═══════════════════ */
 const NEBULAE = [
@@ -77,8 +79,12 @@ export default function TheArchipelago() {
   const [loading, setLoading] = useState(true);
   const [hoveredIsland, setHoveredIsland] = useState(null);
   const [mounted, setMounted] = useState(false);
+  const [stars, setStars] = useState([]);
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    setMounted(true);
+    setStars(generateStars(80));
+  }, []);
 
   useEffect(() => {
     fetch("/api/passion-lab")
@@ -91,7 +97,7 @@ export default function TheArchipelago() {
   }, []);
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#020510] text-[#b8c8d8] select-none">
+    <main className="relative min-h-screen scrollable-page bg-[#020510] text-[#b8c8d8] select-none">
       {/* ═══════════════════ 层级 0：深空背景 ═══════════════════ */}
       <div className="absolute inset-0 bg-[#020510]" />
 
@@ -103,7 +109,7 @@ export default function TheArchipelago() {
           transition={{ duration: 600, repeat: Infinity, ease: "linear" }}
           style={{ transformOrigin: "50% 50%" }}
         >
-          {STARS.map((p, i) => (
+          {stars.map((p, i) => (
             <motion.div
               key={i}
               className="absolute rounded-full bg-white"

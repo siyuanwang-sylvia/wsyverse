@@ -94,7 +94,7 @@ export default function Archive() {
     : 0;
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#050816] text-[#e8d7b5]">
+    <main className="relative min-h-screen scrollable-page bg-[#050816] text-[#e8d7b5]">
 
       {/* 返回键 */}
       <motion.div

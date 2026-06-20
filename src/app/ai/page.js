@@ -12,7 +12,7 @@ export default function AINexus() {
   useEffect(() => { setMounted(true); }, []);
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#020510] text-[#b8c8d8]">
+    <main className="relative min-h-screen scrollable-page bg-[#020510] text-[#b8c8d8]">
 
       {/* 返回键 */}
       <motion.div

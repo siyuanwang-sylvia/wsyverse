@@ -99,6 +99,7 @@ function scanIslands() {
         fs.readdirSync(p, { withFileTypes: true }).forEach(f => {
           if (f.isDirectory()) walk(path.join(p, f.name));
           else {
+            if (f.name === ".gitkeep" || f.name === "island.json") return;
             fileCount++;
             const full = path.join(p, f.name);
             const ext = f.name.split(".").pop().toLowerCase();

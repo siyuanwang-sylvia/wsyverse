@@ -1,22 +1,48 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { useParams } from "next/navigation";
+import { motion } from "framer-motion";
 
 /* ══════════════════════════════════
-   书架元数据
+   书架元数据 — 3 个模块
    ══════════════════════════════════ */
 const SHELF_META = {
-  cpa:       { title: "CPA",           subtitle: "注册会计师",       icon: "\uD83D\uDCCA", desc: "会计 · 审计 · 税法 · 财务成本管理", color: "#d6b77a", glow: "#8d7753" },
-  ielts:    { title: "IELTS",        subtitle: "雅思",               icon: "\u270E",  desc: "听力 · 阅读 · 写作 · 口语", color: "#e8d8a8", glow: "#b8a060" },
-  phd:       { title: "PhD Research",   subtitle: "博士研究",           icon: "\u22B9",  desc: "论文 · 文献 · 研究方法 · 笔记", color: "#ddd0b0", glow: "#a89860" },
-  finance:   { title: "Finance",        subtitle: "金融",               icon: "\u2B21",  desc: "投资 · 衍生品 · 风险管理", color: "#e0d4b8", glow: "#a89860" },
-  psychology: { title: "Psychology",     subtitle: "心理学",             icon: "\u263D",  desc: "荣格 · 认知 · 社会 · 发展", color: "#d8c8a0", glow: "#a89050" },
-  ai:        { title: "Artificial Intelligence", subtitle: "人工智能",   icon: "\u25C7",  desc: "机器学习 · LLM · RAG · 向量数据库", color: "#c8d8f0", glow: "#6888c0" },
-  languages:  { title: "Languages",      subtitle: "语言",               icon: "\u270F",  desc: "英语 · 法语 · 日语 · 更多", color: "#d0c8a8", glow: "#a08850" },
-  books:     { title: "Books",          subtitle: "阅读",               icon: "\u25B0",  desc: "电子书 · 笔记 · 摘录 · 书评", color: "#e4d8b4", glow: "#b89850" },
+  academic: {
+    title: "学术类",
+    subtitle: "Academic Archives",
+    icon: "✦",
+    desc: "会计 · 金融 · 心理 · AI · 博士研究 · 阅读",
+    color: "#d6b77a",
+  },
+  art: {
+    title: "艺术类",
+    subtitle: "Artistic Realms",
+    icon: "◇",
+    desc: "设计 · 摄影 · 音乐 · 影视 · 创意文档",
+    color: "#9a7dd0",
+  },
+  language: {
+    title: "语言类",
+    subtitle: "Language Studios",
+    icon: "✿",
+    desc: "英语 · 法语 · 日语 · 雅思 · 更多",
+    color: "#7ab0a0",
+  },
 };
+
+/* 媒体类型筛选标签 */
+const TYPE_TABS = [
+  { key: "all",    label: "全部",  icon: "⊞" },
+  { key: "image",  label: "照片",  icon: "◎" },
+  { key: "video",  label: "视频",  icon: "▶" },
+  { key: "audio",  label: "音频",  icon: "♪" },
+  { key: "pdf",    label: "PDF",   icon: "📄" },
+  { key: "doc",    label: "文档",  icon: "📝" },
+  { key: "text",   label: "文本",  icon: "📃" },
+  { key: "other",  label: "其他",  icon: "📁" },
+];
 
 function fmtSize(bytes) {
   if (bytes < 1024) return `${bytes} B`;
@@ -27,12 +53,14 @@ function fmtSize(bytes) {
 /* ══════════════════════════════════
    页面主组件
    ══════════════════════════════════ */
-export default function ShelfPage({ params }) {
-  const { shelf: shelfId } = params;
+export default function ShelfPage() {
+  const { shelf: shelfId } = useParams();
   const meta = SHELF_META[shelfId];
 
   const [files, setFiles] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [activeType, setActiveType] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     async function fetchData() {
@@ -42,18 +70,15 @@ export default function ShelfPage({ params }) {
           const data = await res.json();
           setFiles(data[shelfId]?.files ?? []);
         }
-      } catch (_) {
-        /* 静默失败 */
-      } finally {
-        setLoading(false);
-      }
+      } catch (_) { /* 静默失败 */ }
+      finally { setLoading(false); }
     }
     fetchData();
   }, [shelfId]);
 
   if (!meta) {
     return (
-      <main className="relative min-h-screen overflow-hidden bg-[#05060a] text-[#f4e6c3] flex items-center justify-center">
+      <main className="relative min-h-screen scrollable-page bg-[#05060a] text-[#f4e6c3] flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-serif mb-4 text-[#5a6a8a]">Shelf not found</h2>
           <Link href="/vault" className="text-[#5a7aa0] hover:text-[#8ab0d0] transition-colors text-sm">
@@ -64,10 +89,33 @@ export default function ShelfPage({ params }) {
     );
   }
 
+  /* ── 筛选 + 搜索 ── */
+  const filteredFiles = useMemo(() => {
+    if (!files) return [];
+    let result = files;
+
+    /* 媒体类型筛选 */
+    if (activeType !== "all") {
+      result = result.filter(f => f.fileType === activeType);
+    }
+
+    /* 搜索 */
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      result = result.filter(f =>
+        f.name.toLowerCase().includes(q) ||
+        (f.displayName && f.displayName.toLowerCase().includes(q))
+      );
+    }
+
+    return result;
+  }, [files, activeType, searchQuery]);
+
   const fileCount = files?.length ?? 0;
+  const filteredCount = filteredFiles.length;
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#05060a] text-[#f4e6c3]">
+    <main className="relative min-h-screen scrollable-page bg-[#05060a] text-[#f4e6c3]">
       {/* 返回键 */}
       <motion.div
         initial={{ opacity: 0, x: -20 }}
@@ -85,10 +133,10 @@ export default function ShelfPage({ params }) {
         </Link>
       </motion.div>
 
-      <div className="relative z-10 max-w-4xl mx-auto px-6 py-28">
+      <div className="relative z-10 max-w-5xl mx-auto px-6 py-28">
         {/* 顶栏 */}
         <motion.div
-          className="flex items-end justify-between border-b border-[#8d7753]/18 pb-6 mb-12"
+          className="flex items-end justify-between border-b border-[#8d7753]/18 pb-6 mb-10"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
         >
@@ -99,6 +147,61 @@ export default function ShelfPage({ params }) {
           </div>
           <div className="text-xs text-[#5e5442] uppercase tracking-[0.3em]">
             {fileCount} {fileCount === 1 ? "file" : "files"}
+          </div>
+        </motion.div>
+
+        {/* 搜索框 + 类型筛选 */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.6 }}
+          className="mb-8 space-y-4"
+        >
+          {/* 搜索框 */}
+          <div className="relative max-w-md">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              placeholder="搜索文件名、关键词..."
+              className="w-full px-5 py-2.5 pl-11 rounded-xl bg-[#0b1020]/80 border border-[#8d7753]/25 text-sm text-[#e8d7b5] placeholder:text-[#5e5442] focus:outline-none focus:border-[#d6b77a]/40 focus:bg-[#0b1020] transition-all duration-500 tracking-[0.05em]"
+            />
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#5e5442] text-sm">🔍</span>
+            {searchQuery.trim() && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-[#5e5442] hover:text-[#d6b77a] text-xs transition-colors"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+
+          {/* 类型筛选标签 */}
+          <div className="flex flex-wrap gap-2">
+            {TYPE_TABS.map(tab => {
+              const isActive = activeType === tab.key;
+              const count = tab.key === "all"
+                ? fileCount
+                : files?.filter(f => f.fileType === tab.key).length ?? 0;
+              return (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveType(tab.key)}
+                  className={`px-3 py-1.5 rounded-lg text-[10px] uppercase tracking-[0.2em] border transition-all duration-500 ${
+                    isActive
+                      ? "border-[#d6b77a]/50 bg-[#d6b77a]/8 text-[#d6b77a]"
+                      : "border-[#8d7753]/15 bg-transparent text-[#5e5442] hover:border-[#8d7753]/30 hover:text-[#8d7753]"
+                  }`}
+                >
+                  <span className="mr-1.5">{tab.icon}</span>
+                  {tab.label}
+                  <span className={`ml-1.5 ${isActive ? "text-[#d6b77a]/60" : "text-[#3d3529]"}`}>
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </motion.div>
 
@@ -114,6 +217,7 @@ export default function ShelfPage({ params }) {
             </motion.div>
           </div>
         ) : fileCount === 0 ? (
+          /* 空书架 */
           <motion.div
             className="flex flex-col items-center justify-center py-24 text-center"
             initial={{ opacity: 0 }}
@@ -137,7 +241,7 @@ export default function ShelfPage({ params }) {
             <div className="mx-auto mb-8 h-px w-16" style={{ backgroundColor: "rgba(141,119,83,0.2)" }} />
 
             {/* 使用步骤 */}
-            <div className="max-w-sm space-y-4">
+            <div className="max-w-sm space-y-4 text-left">
               <div className="flex items-start gap-3">
                 <span className="text-[#d6b77a]/30 text-sm mt-0.5">1</span>
                 <p className="text-xs text-[#6f6249] leading-6">
@@ -150,7 +254,9 @@ export default function ShelfPage({ params }) {
               <div className="flex items-start gap-3">
                 <span className="text-[#d6b77a]/30 text-sm mt-0.5">2</span>
                 <p className="text-xs text-[#6f6249] leading-6">
-                  把你的 PDF / DOCX / TXT 文件放进去
+                  按类型放入子文件夹：<br />
+                  <code className="text-[#5e5442]">photos/</code> 照片 · <code className="text-[#5e5442]">videos/</code> 视频<br />
+                  <code className="text-[#5e5442]">audio/</code> 音频 · <code className="text-[#5e5442]">files/</code> 文档
                 </p>
               </div>
               <div className="flex items-start gap-3">
@@ -166,20 +272,39 @@ export default function ShelfPage({ params }) {
             </p>
           </motion.div>
         ) : (
-          <div className="grid gap-5 md:grid-cols-2">
-            {files.map((file, i) => (
-              <FileCard key={file.name + "-" + file.modified} file={file} index={i} />
-            ))}
-          </div>
+          <>
+            {/* 筛选结果计数 */}
+            {activeType !== "all" || searchQuery.trim() ? (
+              <p className="mb-6 text-xs text-[#5e5442] uppercase tracking-[0.2em]">
+                {filteredCount} / {fileCount} files
+                {searchQuery.trim() && ` · 搜索"${searchQuery}"`}
+              </p>
+            ) : null}
+
+            {/* 文件水falls 网格 */}
+            {filteredCount === 0 ? (
+              <div className="text-center py-16 text-[#5e5442] text-sm">
+                没有匹配"{TYPE_TABS.find(t => t.key === activeType)?.label}"类型的文件
+              </div>
+            ) : (
+              <div className="columns-1 md:columns-2 lg:columns-3 gap-5 [column-fill:_balance]">
+                {filteredFiles.map((file, i) => (
+                  <div key={file.name + "-" + file.modified} className="mb-5 break-inside-avoid">
+                    <FileCard file={file} index={i} />
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
         )}
 
         {/* 添加提示 */}
         <div className="mt-12 border-t border-[#8d7753]/12 pt-6">
           <p className="text-xs leading-7 text-[#3d3529]">
             <span className="mr-2 text-[#6f6249]">✦</span>
-            新增内容：把文件放入
+            新增内容：把文件放入对应子文件夹
             <code className="mx-1 px-1.5 py-0.5 bg-[#0b1020] border border-[#8d7753]/10 rounded text-[#5e5442] text-[10px]">
-              public/knowledge/{shelfId}/
+              public/knowledge/{shelfId}/&lt;类型&gt;/
             </code>
             刷新页面即可。
           </p>
@@ -190,15 +315,21 @@ export default function ShelfPage({ params }) {
 }
 
 /* ══════════════════════════════════
-   FileCard — 文件卡片
+   FileCard — 文件卡片（支持图片预览）
    ══════════════════════════════════ */
 function FileCard({ file, index }) {
   const ft = file.fileType || "other";
+  const isImage = ft === "image";
+  const isVideo = ft === "video";
+  const isPdf   = ft === "pdf";
+
   const iconMap = {
-    pdf:   { label: "PDF", color: "text-red-400/70",   border: "border-red-900/20" },
-    image: { label: "IMG", color: "text-emerald-400/70", border: "border-emerald-900/20" },
-    text:  { label: "TXT", color: "text-blue-400/70",  border: "border-blue-900/20" },
-    doc:   { label: "DOC", color: "text-blue-400/70",  border: "border-blue-900/20" },
+    pdf:   { label: "PDF",  color: "text-red-400/70",   border: "border-red-900/20" },
+    image: { label: "IMG",  color: "text-emerald-400/70", border: "border-emerald-900/20" },
+    video: { label: "VIDEO", color: "text-purple-400/70", border: "border-purple-900/20" },
+    audio: { label: "AUDIO", color: "text-amber-400/70",  border: "border-amber-900/20" },
+    text:  { label: "TXT",  color: "text-blue-400/70",  border: "border-blue-900/20" },
+    doc:   { label: "DOC",  color: "text-blue-400/70",  border: "border-blue-900/20" },
     other: { label: "FILE", color: "text-zinc-400/70",  border: "border-zinc-700/20" },
   };
   const cfg = iconMap[ft] || iconMap.other;
@@ -207,16 +338,36 @@ function FileCard({ file, index }) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.06, duration: 0.6 }}
+      transition={{ delay: index * 0.05, duration: 0.5 }}
       className="group relative overflow-hidden rounded-xl border border-[#8d7753]/18 bg-[#0b1020]/80 backdrop-blur-sm hover:border-[#8d7753]/35 transition-all duration-500"
     >
-      {/* PDF / DOC 图标区 */}
-      {(ft === "pdf" || ft === "doc") && (
+      {/* 图片预览 */}
+      {isImage && (
+        <div className="relative overflow-hidden">
+          <img
+            src={file.url}
+            alt={file.displayName}
+            className="w-full h-auto object-cover"
+            loading="lazy"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0b1020] via-transparent to-transparent opacity-60" />
+        </div>
+      )}
+
+      {/* 视频图标 */}
+      {isVideo && (
+        <div className="relative h-28 flex items-center justify-center bg-[#0a0d18] overflow-hidden">
+          <div className="absolute inset-0" style={{ background: "radial-gradient(circle at center, rgba(140,80,200,0.06) 0%, transparent 70%)" }} />
+          <span className="text-3xl text-purple-400/20">▶</span>
+          <span className="ml-2 text-xs uppercase tracking-[0.3em] text-purple-400/30">Video</span>
+        </div>
+      )}
+
+      {/* PDF 图标区 */}
+      {(isPdf) && (
         <div className="relative h-20 flex items-center justify-center bg-[#0a0d18] overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(180,60,60,0.04)_0%,transparent_70%)]" />
-          <span className={`text-2xl font-serif ${ft === "pdf" ? "text-red-400/20" : "text-blue-400/20"} tracking-[0.1em]`}>
-            {ft.toUpperCase()}
-          </span>
+          <div className="absolute inset-0" style={{ background: "radial-gradient(circle at center, rgba(180,60,60,0.04) 0%, transparent 70%)" }} />
+          <span className="text-2xl font-serif text-red-400/20 tracking-[0.1em]">PDF</span>
         </div>
       )}
 
@@ -250,7 +401,7 @@ function FileCard({ file, index }) {
             rel="noopener noreferrer"
             className="flex-1 text-center py-1.5 text-[10px] uppercase tracking-[0.25em] border border-[#8d7753]/20 text-[#d6b77a]/60 hover:bg-[#d6b77a]/5 hover:text-[#d6b77a] transition-all duration-500 rounded-lg"
           >
-            {ft === "pdf" ? "打开阅读" : "下载文件"}
+            {isPdf ? "打开阅读" : isImage ? "查看图片" : isVideo ? "播放视频" : "下载文件"}
           </a>
         </div>
       </div>

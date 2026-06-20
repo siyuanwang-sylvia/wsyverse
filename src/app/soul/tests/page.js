@@ -244,7 +244,7 @@ export default function Tests() {
      渲染
      ═══════════════════════════════════════════ */
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#050816] text-[#e8d7b5]">
+    <main className="relative min-h-screen scrollable-page bg-[#050816] text-[#e8d7b5]">
 
       {/* ── 背景层 ──────────────────────────── */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_20%,#161b2e_0%,#090b14_50%,#050816_100%)]" />
