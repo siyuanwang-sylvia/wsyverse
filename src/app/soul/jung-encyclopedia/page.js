@@ -733,33 +733,9 @@ export default function JungEncyclopedia() {
           <section id="applications" className="scroll-mt-24">
             <FadeInSection>
               <h2 className={`text-3xl font-light ${currentTheme.text} mb-8`}>实际应用</h2>
-              <div className={`${currentTheme.bgCard} backdrop-blur-lg rounded-2xl p-8 ${currentTheme.cardShadow} border ${currentTheme.border} space-y-6`}>
-                <div>
-                  <h3 className={`text-xl ${currentTheme.text} mb-4`}>自我认知与成长</h3>
-                  <p className={`${currentTheme.textSecondary} leading-relaxed`}>
-                    了解自己的主导功能和劣势功能，可以帮助我们理解自己的行为模式、沟通风格和学习偏好。通过有意识地发展非主导功能，我们可以实现心理的整合与平衡。
-                  </p>
-                </div>
-
-                <div>
-                  <h3 className={`text-xl ${currentTheme.text} mb-4`}>人际关系</h3>
-                  <p className={`${currentTheme.textSecondary} leading-relaxed`}>
-                    理解他人的心理类型，可以帮助我们更好地沟通、减少冲突。例如，思考型的人可能需要学习表达对他人的欣赏，而情感型的人可能需要学习直接表达分歧。
-                  </p>
-                </div>
-
-                <div>
-                  <h3 className={`text-xl ${currentTheme.text} mb-4`}>职业选择</h3>
-                  <p className={`${currentTheme.textSecondary} leading-relaxed`}>
-                    不同的心理功能偏好适合不同的职业环境。例如，主导功能为 Ti 的人可能在研究、分析或编程领域表现出色，而主导功能为 Fe 的人可能在教育、咨询或人力资源领域找到满足感。
-                  </p>
-                </div>
-
-                <div>
-                  <h3 className={`text-xl ${currentTheme.text} mb-4`}>团队协作</h3>
-                  <p className={`${currentTheme.textSecondary} leading-relaxed`}>
-                    在团队中，不同心理类型的成员可以互补。了解团队成员的类型分布，可以帮助领导者合理分配任务、优化沟通方式、提升团队效能。
-                  </p>
+              <div className={`${currentTheme.bgCard} backdrop-blur-lg rounded-2xl p-8 ${currentTheme.cardShadow} border ${currentTheme.border}`}>
+                <div className="prose prose-lg max-w-none">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{applicationsContent}</ReactMarkdown>
                 </div>
               </div>
             </FadeInSection>
@@ -769,71 +745,12 @@ export default function JungEncyclopedia() {
           <section id="resources" className="scroll-mt-24">
             <FadeInSection>
               <h2 className={`text-3xl font-light ${currentTheme.text} mb-8`}>延伸资源</h2>
+              <div className={`${currentTheme.bgCard} backdrop-blur-lg rounded-2xl p-8 ${currentTheme.cardShadow} border ${currentTheme.border}`}>
+                <div className="prose prose-lg max-w-none">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{resourcesContent}</ReactMarkdown>
+                </div>
+              </div>
             </FadeInSection>
-
-            <div className="grid md:grid-cols-2 gap-6">
-              <FadeInSection>
-                <div className={`${currentTheme.bgCard} backdrop-blur-lg rounded-2xl p-8 ${currentTheme.cardShadow} border ${currentTheme.border}`}>
-                  <h3 className={`text-xl ${currentTheme.text} mb-6`}>在线测试</h3>
-                  <a
-                    href="https://www.jungus.cn/zh-hans/test/Standard"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`inline-flex items-center gap-2 px-6 py-3 ${currentTheme.accentBg} ${currentTheme.accent} rounded-lg hover:shadow-lg transition-all duration-500`}
-                  >
-                    荣格认知功能测试 →
-                  </a>
-                </div>
-              </FadeInSection>
-
-              <FadeInSection>
-                <div className={`${currentTheme.bgCard} backdrop-blur-lg rounded-2xl p-8 ${currentTheme.cardShadow} border ${currentTheme.border}`}>
-                  <h3 className={`text-xl ${currentTheme.text} mb-6`}>推荐阅读</h3>
-                  <ul className={`space-y-3 ${currentTheme.textSecondary}`}>
-                    <li>• 《心理类型》- 卡尔·荣格</li>
-                    <li>• 《荣格心理学入门》- 徐均</li>
-                    <li>• 《类型与原型》- 约翰·毕比</li>
-                    <li>• 《请理解我》- 大卫·凯尔西</li>
-                  </ul>
-                </div>
-              </FadeInSection>
-
-              <FadeInSection>
-                <div className={`${currentTheme.bgCard} backdrop-blur-lg rounded-2xl p-8 ${currentTheme.cardShadow} border ${currentTheme.border}`}>
-                  <h3 className={`text-xl ${currentTheme.text} mb-6`}>延伸学习路线</h3>
-                  <div className="space-y-3">
-                    {[
-                      "MBTI 十六种类型详解",
-                      "认知功能发展 stages",
-                      "原型理论：阴影、阿尼玛、阿尼姆斯",
-                      "集体无意识与象征",
-                      "个体化过程（Individuation）",
-                    ].map((item, i) => (
-                      <div key={i} className={`flex items-center gap-3 ${currentTheme.textSecondary}`}>
-                        <span className={currentTheme.accent}>→</span>
-                        <span className="text-sm">{item}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </FadeInSection>
-
-              <FadeInSection>
-                <div className={`${currentTheme.bgCard} backdrop-blur-lg rounded-2xl p-8 ${currentTheme.cardShadow} border ${currentTheme.border}`}>
-                  <h3 className={`text-xl ${currentTheme.text} mb-6`}>相关主题</h3>
-                  <div className="flex flex-wrap gap-3">
-                    {["MBTI", "认知功能", "原型理论", "集体无意识", "个体化", "梦的解析", "炼金术心理学"].map((tag, i) => (
-                      <span
-                        key={i}
-                        className={`px-4 py-2 text-sm rounded-full ${currentTheme.accentBg} ${currentTheme.accent} cursor-pointer hover:shadow-md transition-all duration-300`}
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </FadeInSection>
-            </div>
           </section>
 
           {/* 继续探索 */}
