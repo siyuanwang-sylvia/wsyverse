@@ -578,6 +578,15 @@ export default function JungEncyclopedia() {
               </p>
             </FadeInSection>
 
+            {/* 功能关系详细内容 */}
+            <FadeInSection>
+              <div className={`${currentTheme.bgCard} backdrop-blur-lg rounded-2xl p-8 ${currentTheme.cardShadow} border ${currentTheme.border} mb-8`}>
+                <div className="prose prose-lg max-w-none">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{relationshipsContent}</ReactMarkdown>
+                </div>
+              </div>
+            </FadeInSection>
+
             {/* 功能对关系图 */}
             <FadeInSection>
               <div className={`${currentTheme.bgCard} backdrop-blur-lg rounded-2xl p-8 ${currentTheme.cardShadow} border ${currentTheme.border} mb-8`}>
