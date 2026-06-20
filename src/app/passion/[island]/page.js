@@ -6,13 +6,9 @@ import Link from "next/link";
 
 /* ═══════════════════ 宇宙语言 ═══════════════════ */
 const TYPE_CONFIG = {
-  image: { en: "Echoes", cn: "回响", icon: "\u25C7", desc: "Visual memories frozen in time" },
-  video: { en: "Fragments", cn: "碎片", icon: "\u25B3", desc: "Moving pieces of your expedition" },
-  pdf: { en: "Archives", cn: "档案", icon: "\u25A1", desc: "Preserved documents and records" },
-  text: { en: "Field Notes", cn: "野记", icon: "\u25BD", desc: "Thoughts and observations from the journey" },
-  audio: { en: "Signals", cn: "信号", icon: "\u25CB", desc: "Resonant frequencies captured" },
-  doc: { en: "Archives", cn: "档案", icon: "\u25A1", desc: "Preserved documents and records" },
-  other: { en: "Relics", cn: "遗物", icon: "\u2606", desc: "Mysterious artifacts collected" },
+  video:    { en: "Videos",    cn: "视频",   icon: "△", desc: "Moving pieces of your expedition" },
+  image:    { en: "Photos",    cn: "照片",   icon: "◇", desc: "Visual memories frozen in time" },
+  document: { en: "Documents", cn: "文档",   icon: "□", desc: "Preserved documents and records" },
 };
 
 const EVO_NAMES = {
@@ -137,11 +133,12 @@ export default function IslandPage({ params }) {
   const sections = data.sections || [];
   const instruments = data.instruments || [];
 
-  // 按类型分组
-  const grouped = {};
+  // 按三大类分组：视频、照片、文档
+  const grouped = { video: [], image: [], document: [] };
   data.files.forEach((f) => {
-    if (!grouped[f.type]) grouped[f.type] = [];
-    grouped[f.type].push(f);
+    if (f.type === "video") grouped.video.push(f);
+    else if (f.type === "image") grouped.image.push(f);
+    else if (f.type === "pdf" || f.type === "doc" || f.type === "text") grouped.document.push(f);
   });
   const activeTypes = Object.keys(grouped).filter((t) => grouped[t].length > 0);
 
