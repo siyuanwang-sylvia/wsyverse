@@ -470,6 +470,11 @@ export default function JungEncyclopedia() {
                     </motion.div>
                   ))}
                 </div>
+
+                {/* 传记详细内容 */}
+                <div className="mt-8 prose prose-lg max-w-none">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{biographyContent}</ReactMarkdown>
+                </div>
               </div>
             </FadeInSection>
           </section>
@@ -478,39 +483,9 @@ export default function JungEncyclopedia() {
           <section id="theory" className="scroll-mt-24">
             <FadeInSection>
               <h2 className={`text-3xl font-light ${currentTheme.text} mb-8`}>理论发展</h2>
-              <div className={`${currentTheme.bgCard} backdrop-blur-lg rounded-2xl p-8 ${currentTheme.cardShadow} border ${currentTheme.border} space-y-6`}>
-                <div>
-                  <h3 className={`text-xl ${currentTheme.text} mb-4`}>心理能量的方向：内倾 vs 外倾</h3>
-                  <p className={`${currentTheme.textSecondary} leading-relaxed`}>
-                    荣格认为，心理能量要么流向内部世界（内倾，Introversion），要么流向外部世界（外倾，Extraversion）。这不是简单的"内向"或"外向"性格，而是心理能量的根本取向。
-                  </p>
-                </div>
-
-                <div>
-                  <h3 className={`text-xl ${currentTheme.text} mb-4`}>四种心理功能</h3>
-                  <p className={`${currentTheme.textSecondary} leading-relaxed mb-4`}>
-                    荣格识别出四种基本的心理功能，分为两组对立的类型：
-                  </p>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    {[
-                      { title: "感觉 (Sensation)", desc: "我们通过感官接收信息的方式" },
-                      { title: "直觉 (Intuition)", desc: "我们感知模式和可能性的方式" },
-                      { title: "思考 (Thinking)", desc: "我们做出逻辑判断的方式" },
-                      { title: "情感 (Feeling)", desc: "我们做出价值评判的方式" },
-                    ].map((item, i) => (
-                      <div key={i} className={`p-4 rounded-xl ${currentTheme.accentBg} border ${currentTheme.accentBorder}`}>
-                        <div className={`font-medium ${currentTheme.accent} mb-1`}>{item.title}</div>
-                        <div className={`text-sm ${currentTheme.textSecondary}`}>{item.desc}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className={`text-xl ${currentTheme.text} mb-4`}>八种认知功能</h3>
-                  <p className={`${currentTheme.textSecondary} leading-relaxed`}>
-                    将心理能量的方向（内倾/外倾）与四种心理功能相结合，就得到了八种认知功能。每个人都会使用所有八种功能，但通常有一两种是主导的，这构成了个体的心理类型。
-                  </p>
+              <div className={`${currentTheme.bgCard} backdrop-blur-lg rounded-2xl p-8 ${currentTheme.cardShadow} border ${currentTheme.border}`}>
+                <div className="prose prose-lg max-w-none">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{theoryContent}</ReactMarkdown>
                 </div>
               </div>
             </FadeInSection>
@@ -578,27 +553,11 @@ export default function JungEncyclopedia() {
                           transition={{ duration: 0.5 }}
                           className="overflow-hidden"
                         >
-                          <div className={`px-6 pb-6 space-y-4 border-t ${currentTheme.border}`}>
-                            <div className="pt-4">
-                              <div className={`text-sm font-medium ${currentTheme.accent} mb-2`}>特点</div>
-                              <div className={`text-sm ${currentTheme.textSecondary} leading-relaxed`}>{func.characteristics}</div>
-                            </div>
-
-                            <div>
-                              <div className={`text-sm font-medium ${currentTheme.accent} mb-2`}>优势</div>
-                              <div className={`text-sm ${currentTheme.textSecondary} leading-relaxed`}>{func.strengths}</div>
-                            </div>
-
-                            <div>
-                              <div className={`text-sm font-medium ${currentTheme.accent} mb-2`}>盲点</div>
-                              <div className={`text-sm ${currentTheme.textSecondary} leading-relaxed`}>{func.blindSpots}</div>
-                            </div>
-
-                            <div>
-                              <div className={`text-sm font-medium ${currentTheme.accent} mb-2`}>生活实例</div>
-                              <div className={`text-sm ${currentTheme.textSecondary} leading-relaxed italic`}>
-                                "{func.example}"
-                              </div>
+                          <div className={`px-6 pb-6 border-t ${currentTheme.border}`}>
+                            <div className="pt-4 prose prose-lg max-w-none">
+                              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                {functionsContent[func.id] || "加载中..."}
+                              </ReactMarkdown>
                             </div>
                           </div>
                         </motion.div>
