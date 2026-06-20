@@ -14,11 +14,6 @@
     "nebulaColor": "rgba(80,40,120,0.04)",
     "atmosphere": "dream-garden"
   },
-  "sections": [
-    { "id": "painting", "name": "Painting", "nameCN": "绘画", "icon": "🎨" },
-    { "id": "photography", "name": "Photography", "nameCN": "摄影", "icon": "📸" },
-    { "id": "dance", "name": "Dance", "nameCN": "舞蹈", "icon": "💃" },
-    { "id": "inspiration-wall", "name": "Inspiration Wall", "nameCN": "灵感墙", "icon": "📌" },
-    { "id": "sketches", "name": "Sketches", "nameCN": "速写本", "icon": "✏" }
-  ]
+  "sections": [],
+  "note": "内容按三大类展示：视频（video）、照片（image）、文档（pdf/doc/txt）"
 }

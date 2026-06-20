@@ -14,19 +14,7 @@
     "nebulaColor": "rgba(20,100,140,0.04)",
     "atmosphere": "ocean-cave"
   },
-  "sections": [
-    { "id": "instruments", "name": "Instruments", "nameCN": "乐器", "icon": "🎹" },
-    { "id": "scores", "name": "Sheet Music", "nameCN": "乐谱", "icon": "🎼" },
-    { "id": "videos", "name": "Performances", "nameCN": "演奏视频", "icon": "🎥" },
-    { "id": "theory", "name": "Theory & Knowledge", "nameCN": "乐理知识", "icon": "📖" },
-    { "id": "performances", "name": "Live Records", "nameCN": "演奏记录", "icon": "🎤" },
-    { "id": "albums", "name": "Collected Albums", "nameCN": "收藏专辑", "icon": "💿" },
-    { "id": "playlists", "name": "Mood Playlists", "nameCN": "情绪歌单", "icon": "🎧" }
-  ],
-  "instruments": [
-    { "id": "guitar", "name": "Guitar", "nameCN": "吉他", "icon": "🎸" },
-    { "id": "piano", "name": "Piano", "nameCN": "钢琴", "icon": "🎹" },
-    { "id": "drums", "name": "Drums", "nameCN": "架子鼓", "icon": "🥁" },
-    { "id": "composition", "name": "Composition", "nameCN": "编曲", "icon": "🎛" }
-  ]
+  "sections": [],
+  "instruments": [],
+  "note": "内容按三大类展示：视频（video）、照片（image）、文档（pdf/doc/txt）"
 }

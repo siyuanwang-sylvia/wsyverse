@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -9,14 +9,27 @@ import { motion, AnimatePresence } from "framer-motion";
    ═════════════════════════════════════ */
 
 const SHELF_META = {
-  cpa:       { title: "CPA",           subtitle: "注册会计师",       icon: "📊", desc: "会计 · 审计 · 税法 · 财务成本管理" },
-  ielts:    { title: "IELTS",        subtitle: "雅思",               icon: "✎",  desc: "听力 · 阅读 · 写作 · 口语" },
-  phd:       { title: "PhD Research",   subtitle: "博士研究",           icon: "⊹",  desc: "论文 · 文献 · 研究方法 · 笔记" },
-  finance:   { title: "Finance",        subtitle: "金融",               icon: "⬡",  desc: "投资 · 衍生品 · 风险管理" },
-  psychology: { title: "Psychology",     subtitle: "心理学",             icon: "☽",  desc: "荣格 · 认知 · 社会 · 发展" },
-  ai:        { title: "AI",             subtitle: "人工智能",           icon: "◇",  desc: "机器学习 · LLM · RAG · 向量数据库" },
-  languages:  { title: "Languages",      subtitle: "语言",               icon: "✿",  desc: "英语 · 法语 · 日语 · 更多" },
-  books:     { title: "Books",          subtitle: "阅读",               icon: "☰",  desc: "电子书 · 笔记 · 摘录 · 书评" },
+  academic: {
+    title: "学术类",
+    subtitle: "Academic Archives",
+    icon: "✦",
+    desc: "会计 · 金融 · 心理 · AI · 博士研究 · 阅读",
+    color: "#d6b77a",
+  },
+  art: {
+    title: "艺术类",
+    subtitle: "Artistic Realms",
+    icon: "◇",
+    desc: "设计 · 摄影 · 音乐 · 影视 · 创意文档",
+    color: "#9a7dd0",
+  },
+  language: {
+    title: "语言类",
+    subtitle: "Language Studios",
+    icon: "✿",
+    desc: "英语 · 法语 · 日语 · 雅思 · 更多",
+    color: "#7ab0a0",
+  },
 };
 
 const SHELF_IDS = Object.keys(SHELF_META);
@@ -41,6 +54,7 @@ export default function VaultPage() {
   const [shelves, setShelves] = useState(null);
   const [activeShelf, setActiveShelf] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     async function fetchData() {
@@ -67,6 +81,25 @@ export default function VaultPage() {
   const totalFiles = shelves
     ? shelves.reduce((s, sh) => s + sh.fileCount, 0)
     : 0;
+
+  /* ── 搜索过滤 ── */
+  const filteredShelves = useMemo(() => {
+    if (!shelves || !searchQuery.trim()) return shelves;
+    const q = searchQuery.toLowerCase().trim();
+    return shelves.map(sh => {
+      const shelfMatch = sh.title.toLowerCase().includes(q)
+        || sh.subtitle.toLowerCase().includes(q)
+        || sh.desc.toLowerCase().includes(q);
+      const matchedFiles = sh.files.filter(f =>
+        f.name.toLowerCase().includes(q)
+        || (f.displayName && f.displayName.toLowerCase().includes(q))
+      );
+      if (shelfMatch || matchedFiles.length > 0) {
+        return { ...sh, files: shelfMatch ? sh.files : matchedFiles, fileCount: shelfMatch ? sh.fileCount : matchedFiles.length };
+      }
+      return null;
+    }).filter(Boolean);
+  }, [shelves, searchQuery]);
 
   /* ── 返回键 ── */
   const backBtn = (
@@ -133,14 +166,41 @@ export default function VaultPage() {
           </p>
           {totalFiles > 0 && (
             <p className="mt-3 text-[10px] uppercase tracking-[0.4em] text-[#5e5442]">
-              {totalFiles} items archived
+              {searchQuery.trim() ? `找到 ${filteredShelves?.length ?? 0} 个书架 · ${filteredShelves?.reduce((s, sh) => s + sh.fileCount, 0) ?? 0} 个文件` : `${totalFiles} items archived`}
             </p>
           )}
         </motion.div>
 
+        {/* 搜索框 */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, duration: 0.8 }}
+          className="relative z-10 max-w-lg mx-auto mt-2 mb-10"
+        >
+          <div className="relative">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              placeholder="搜索书籍、笔记、关键词..."
+              className="w-full px-5 py-3 pl-12 rounded-xl bg-[#0b1020]/80 border border-[#8d7753]/25 text-sm text-[#e8d7b5] placeholder:text-[#5e5442] focus:outline-none focus:border-[#d6b77a]/40 focus:bg-[#0b1020] transition-all duration-500 tracking-[0.05em]"
+            />
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#5e5442] text-sm">🔍</span>
+            {searchQuery.trim() && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-[#5e5442] hover:text-[#d6b77a] text-xs transition-colors"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+        </motion.div>
+
         {/* 书架网格 */}
         <div className="relative z-10 max-w-[1200px] mx-auto px-6 pb-24 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {shelves.map((shelf, i) => (
+          {(filteredShelves || shelves).map((shelf, i) => (
             <motion.button
               key={shelf.id}
               onClick={() => setActiveShelf(shelf.id)}

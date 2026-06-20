@@ -23,18 +23,10 @@ const gates = [
   {
     title: "TEST BASE",
     subtitle: "灵魂测验台",
-    desc: "MBTI · 九型 · 心理探索",
+    desc: "荣格八维 · 性格类型探索",
     href: "/soul/tests",
-    symbol: "⟁",
-    label: "Psychological Tests",
-  },
-  {
-    title: "PERSONA",
-    subtitle: "人格镜像室",
-    desc: "解密 · Shadow · 自我原型",
-    href: "/soul/persona",
-    symbol: "🜂",
-    label: "Persona Chamber",
+    symbol: "△",
+    label: "Jung Type Test",
   },
 ];
 
@@ -76,7 +68,7 @@ export default function Soul() {
   return (
     <main className="relative h-screen overflow-hidden bg-[#050816] text-[#e8d7b5]">
 
-      {/* 返回键 - 更高对比度 */}
+      {/* 返回键 - 更高对比度，带光晕 */}
       <motion.div
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
@@ -86,7 +78,7 @@ export default function Soul() {
         <Link href="/">
           <motion.div
             whileHover={{ x: -4 }}
-            className="px-5 py-3 border border-amber-700/60 rounded-xl bg-[#0b1020]/95 backdrop-blur-lg text-sm uppercase tracking-[0.2em] text-amber-200 hover:bg-amber-900/30 hover:text-amber-100 transition-all duration-500 shadow-lg shadow-amber-900/20"
+            className="px-5 py-3 border border-amber-400/50 rounded-xl bg-[#0b1020]/95 backdrop-blur-lg text-sm uppercase tracking-[0.2em] text-amber-300 hover:bg-amber-900/40 hover:text-amber-200 hover:border-amber-400/70 transition-all duration-500 shadow-[0_0_15px_rgba(214,183,122,0.15)]"
           >
             ← Universe
           </motion.div>
@@ -229,17 +221,56 @@ export default function Soul() {
           ))}
         </div>
 
-        {/* 底部低语 */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.2, duration: 2 }}
-          className="mt-8 text-center"
-        >
-          <p className="text-[10px] uppercase tracking-[0.45em] text-[#3d3529]">
-            Some memories were never meant to disappear
-          </p>
-        </motion.div>
+      {/* 底部低语 */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.2, duration: 2 }}
+        className="mt-8 text-center"
+      >
+        <p className="text-[10px] uppercase tracking-[0.45em] text-[#3d3529]">
+          Some memories were never meant to disappear
+        </p>
+      </motion.div>
+
+      {/* 右下角浮动 Persona 模块 */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 1.8, duration: 1.2, type: "spring", stiffness: 60 }}
+        className="fixed bottom-8 right-8 z-50"
+      >
+        <Link href="/soul/persona">
+          <motion.div
+            whileHover={{ scale: 1.15, y: -4 }}
+            whileTap={{ scale: 0.95 }}
+            className="relative w-14 h-14 rounded-full flex items-center justify-center cursor-pointer group"
+            style={{
+              background: "radial-gradient(circle at 35% 35%, #d6b77a30, #0b1020 70%)",
+              border: "1px solid rgba(214,183,122,0.3)",
+              boxShadow: "0 0 20px rgba(214,183,122,0.12)",
+            }}
+          >
+            {/* 外环光晕 */}
+            <motion.div
+              className="absolute inset-[-6px] rounded-full border border-dashed"
+              style={{ borderColor: "rgba(214,183,122,0.12)" }}
+              animate={{ rotate: [0, 360] }}
+              transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+            />
+            {/* 镜面符号 */}
+            <span className="text-lg text-[#d6b77a]/60 group-hover:text-[#ffe7b0] transition-colors duration-700">
+              &#x25C7;
+            </span>
+            {/* Hover 提示 */}
+            <div className="absolute bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+              <div className="whitespace-nowrap px-3 py-1.5 rounded-lg bg-[#0b1020]/95 border border-[#8d7753]/25 text-[10px] uppercase tracking-[0.25em] text-[#d6b77a]">
+                Persona Chamber
+              </div>
+            </div>
+          </motion.div>
+        </Link>
+      </motion.div>
 
       </section>
     </main>
