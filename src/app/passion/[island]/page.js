@@ -108,6 +108,32 @@ export default function IslandPage() {
     setParticles(generateParticles(30, theme.particleColor));
   }, [theme.particleColor]);
 
+  // ── 以下 useMemo 必须在所有早期 return 之前（React Hooks 排序规则）──
+  const displayFiles = useMemo(() => {
+    let files = data?.files || [];
+    if (filterType !== "all") {
+      if (filterType === "document") {
+        files = files.filter(f => ["pdf","doc","text"].includes(f.type));
+      } else {
+        files = files.filter(f => f.type === filterType);
+      }
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      files = files.filter(f => f.name.toLowerCase().includes(q));
+    }
+    return files;
+  }, [data?.files, filterType, searchQuery]);
+
+  const availableTypes = useMemo(() => {
+    const types = new Set(data?.files?.map(f => {
+      if (["pdf","doc","text"].includes(f.type)) return "document";
+      return f.type;
+    }) || []);
+    return ["all", ...Array.from(types)];
+  }, [data?.files]);
+
+  // ── 早期 return：加载中 ──
   if (loading) {
     return (
       <main className="min-h-screen bg-[#020510] flex items-center justify-center">
@@ -122,6 +148,7 @@ export default function IslandPage() {
     );
   }
 
+  // ── 早期 return：岛屿不存在 ──
   if (!data || data.error) {
     return (
       <main className="min-h-screen bg-[#020510] flex items-center justify-center">
@@ -141,32 +168,6 @@ export default function IslandPage() {
   const evo = EVO_NAMES[level] || EVO_NAMES[0];
   const sections = data.sections || [];
   const instruments = data.instruments || [];
-
-  // 过滤 + 搜索
-  const displayFiles = useMemo(() => {
-    let files = data.files || [];
-    if (filterType !== "all") {
-      if (filterType === "document") {
-        files = files.filter(f => ["pdf","doc","text"].includes(f.type));
-      } else {
-        files = files.filter(f => f.type === filterType);
-      }
-    }
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      files = files.filter(f => f.name.toLowerCase().includes(q));
-    }
-    return files;
-  }, [data.files, filterType, searchQuery]);
-
-  // 可用类型 tab
-  const availableTypes = useMemo(() => {
-    const types = new Set(data.files?.map(f => {
-      if (["pdf","doc","text"].includes(f.type)) return "document";
-      return f.type;
-    }) || []);
-    return ["all", ...Array.from(types)];
-  }, [data.files]);
 
   return (
     <main className="min-h-screen scrollable-page text-[#b8c8d8]" style={{ background: theme.bg }}>
